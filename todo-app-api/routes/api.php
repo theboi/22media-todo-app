@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\ShareController;
 use App\Http\Controllers\SnapshotController;
 use App\Http\Controllers\TodoController;
 use App\Http\Controllers\TodoListController;
@@ -21,6 +22,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('todos', [TodoController::class, 'index'])->name('todos.index');
     Route::get('todos/{id}', [TodoController::class, 'show'])->name('todos.show');
     Route::get('settings', [SettingsController::class, 'show'])->name('settings.show');
+    Route::get('todo-lists/{id}/shares', [ShareController::class, 'index'])->name('shares.index');
+    Route::get('shares/pending', [ShareController::class, 'pending'])->name('shares.pending');
     Route::get('sync/snapshot', SnapshotController::class)->name('snapshot');
     Route::middleware(IdempotentMutation::class)->group(function () {
         Route::post('todo-lists', [TodoListController::class, 'store'])->name('lists.store');
@@ -30,5 +33,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::match(['PATCH', 'PUT'], 'todos/{id}', [TodoController::class, 'update'])->name('todos.update');
         Route::delete('todos/{id}', [TodoController::class, 'destroy'])->name('todos.destroy');
         Route::patch('settings', [SettingsController::class, 'update'])->name('settings.update');
+        Route::post('todo-lists/{id}/shares', [ShareController::class, 'store'])->name('shares.store');
+        Route::delete('todo-lists/{id}/shares/{share}', [ShareController::class, 'destroy'])->name('shares.destroy');
+        Route::post('shares/{id}/accept', [ShareController::class, 'accept'])->name('shares.accept');
+        Route::post('shares/{id}/decline', [ShareController::class, 'decline'])->name('shares.decline');
+        Route::post('todo-lists/{id}/leave',[ShareController::class, 'leave'])->name('shares.leave');
     });
 });
