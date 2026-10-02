@@ -41,51 +41,51 @@
 
 **Files:** todo-app-api/composer.json, bootstrap/app.php, config/*; todo-app-client/package.json, app.json, eslint.config.js; src/lib/api/types.ts; docs/plans/2026-10-02-eves-execution-ledger.md.
 **Interfaces:** Produces Laravel/Sanctum runtime, API types and test/lint/typecheck commands.
-- [ ] Install missing PHP/Composer and create Laravel scaffold without overwriting backend AGENTS.md; install Sanctum and initialize durable SQLite.
-- [ ] Add SDK-compatible Expo persistence/network/notification/crypto dependencies using expo install; add TypeScript node-test runner and lint configuration.
-- [ ] Run generated Laravel baseline tests and client typecheck before behavior changes. Read matching installed-version Laravel docs and SDK57 docs.
-- [ ] Record runtime versions, initial failures and rulings in ledger.
+- [x] Install missing PHP/Composer and create Laravel scaffold without overwriting backend AGENTS.md; install Sanctum and initialize durable SQLite.
+- [x] Add SDK-compatible Expo persistence/network/notification/crypto dependencies using expo install; add TypeScript node-test runner and lint configuration.
+- [x] Run generated Laravel baseline tests and client typecheck before behavior changes. Read matching installed-version Laravel docs and SDK57 docs.
+- [x] Record runtime versions, initial failures and rulings in ledger.
 
 ### Task 2: Guest/authentication and strict API boundaries
 
 **Files:** app/Models/{Account,User}.php, app/Http/{Controllers/AuthController,Requests/*,Resources/*,Middleware/*}.php, app/Actions/Auth/*, routes/api.php, tests/Feature/AuthTest.php.
 **Interfaces:** Consumes runtime; produces authenticated account-scoped Session and frozen auth routes.
-- [ ] Write HTTP tests for guest provisioning, XOR account identity, register retaining lists, login without merge, bad credentials, exact field validation, case-normalized email, sign-out and verified-email share requirement; run to observe missing routes fail.
-- [ ] Implement schema, Sanctum account principal, Form Request normalization/types/unknown-field rejection, uniform errors/headers, auth transitions and verification code delivery/rate limits.
-- [ ] Run AuthTest and full backend suite; expected all pass with isolated SQLite and faked mail.
+- [x] Write HTTP tests for guest provisioning, XOR account identity, register retaining lists, login without merge, bad credentials, exact field validation, case-normalized email, sign-out and verified-email share requirement; run to observe missing routes fail.
+- [x] Implement schema, Sanctum account principal, Form Request normalization/types/unknown-field rejection, uniform errors/headers, auth transitions and verification code delivery/rate limits.
+- [x] Run AuthTest and full backend suite; expected all pass with isolated SQLite and faked mail.
 
 ### Task 3: Authorized CRUD/settings/shares/snapshot and receipts
 
 **Files:** app/Models/{TodoList,Todo,MutationReceipt}.php, app/Policies/*, app/Http/{Controllers,Requests,Resources}/*, app/Actions/{Sharing,Retry}/*, migrations/*, tests/Feature/{CrudTest,SharingTest,RetryTest}.php.
 **Interfaces:** Produces all 19 endpoint paths, flat requests and exact resources for client.
-- [ ] Write failing HTTP tests for nested list detail, todo revision/no-op updates, HEAD body, strict null/type inputs, owner/member boundaries, unknown-email shares/accept/leave/revoke, settings references, hard cascade deletion and lost-response retry safety.
-- [ ] Implement scoped queries, policies/resources, short transactional multi-record operations, atomic mutation receipts, complete snapshot and hard deletion without history.
-- [ ] Verify operation reuse rejects changed payload; replay returns current resource or 404 after deletion, never recreates. Run full backend tests and Pint; expected green.
+- [x] Write failing HTTP tests for nested list detail, todo revision/no-op updates, HEAD body, strict null/type inputs, owner/member boundaries, unknown-email shares/accept/leave/revoke, settings references, hard cascade deletion and lost-response retry safety.
+- [x] Implement scoped queries, policies/resources, short transactional multi-record operations, atomic mutation receipts, complete snapshot and hard deletion without history.
+- [x] Verify operation reuse rejects changed payload; replay returns current resource or 404 after deletion, never recreates. Run full backend tests and Pint; expected green.
 
 ### Task 4: Durable client offline engine and API transport
 
 **Files:** src/lib/api/*.ts; src/features/app/{types,selectors,reconcile,storage}.ts; co-located *.test.ts.
 **Interfaces:** Consumes frozen API types; produces persistent base/action overlays and a replay engine for provider.
-- [ ] Write failing node tests for snapshot-vs-overlay comparison, unchanged PATCH vs changed/missing POST-copy, changed delete confirmation, unavailable parent blocking, cancelled draft list children, identical-version conflict rule, frozen retry recovery and account cache reset.
-- [ ] Implement typed boundary validation and safe API errors, serialized SQLite state writes, secure credential adapter, stable request IDs, one-time device comparison, receipts recovery before comparison, action coalescing and partial-failure recovery.
-- [ ] Run npm test and typecheck; expected all engine cases pass using real pure logic and controlled transport/persistence boundaries.
+- [x] Write failing node tests for snapshot-vs-overlay comparison, unchanged PATCH vs changed/missing POST-copy, changed delete confirmation, unavailable parent blocking, cancelled draft list children, identical-version conflict rule, frozen retry recovery and account cache reset.
+- [x] Implement typed boundary validation and safe API errors, serialized SQLite state writes, secure credential adapter, stable request IDs, one-time device comparison, receipts recovery before comparison, action coalescing and partial-failure recovery.
+- [x] Run npm test and typecheck; expected all engine cases pass using real pure logic and controlled transport/persistence boundaries.
 
 ### Task 5: Expo UI workflows and app integration
 
 **Files:** src/features/app/provider.tsx; src/app/{_layout,index,auth,list,todo,(tabs)/*}.tsx; src/components/ui/*; src/features/{onboarding,auth,home,lists,todos,settings}/*.
 **Interfaces:** Consumes facade specified above, produces onboarding/create/sign-in, Lists/Home/Settings tabs, CRUD forms/sharing/inbox/layout controls.
-- [ ] Implement ready/empty/error states, context guard, account-scoped cache bootstrap, online attempts/foreground/manual refresh and safe async mutation errors.
-- [ ] Build Expo UI controls within Host, native screen layouts, list grid, virtualized todo groups, exact deadline entry, pending-share verification/acceptance, owner controls and sign-out sync/discard flow.
-- [ ] Verify selectors for deadline/undated ordering and selected sections; run lint/typecheck plus web export to catch route/import/native interface mistakes. Check visible flows against real API where possible.
+- [x] Implement ready/empty/error states, context guard, account-scoped cache bootstrap, online attempts/foreground/manual refresh and safe async mutation errors.
+- [x] Build Expo UI controls within Host, native screen layouts, list grid, virtualized todo groups, exact deadline entry, pending-share verification/acceptance, owner controls and sign-out sync/discard flow.
+- [x] Verify selectors for deadline/undated ordering and selected sections; run lint/typecheck plus web export to catch route/import/native interface mistakes. Check visible flows against real API where possible.
 
 ### Task 6: Notifications, integration verification and run guide
 
 **Files:** src/features/app/notifications.ts, client app.json/.env.example, root README.md, execution ledger.
 **Interfaces:** Consumes derived accessible outstanding todos; produces one-day local reminders and repeatable demo setup.
-- [ ] Write failing reminder-policy tests for one-day scheduling, overdue/late trigger skipping, completion/removal/account switch cancellation and duplicate/restart stability.
-- [ ] Implement Expo Notifications permission/channel behavior and reconciliation; persist IDs separately and cancel stale reminders. Permission denial leaves CRUD usable.
-- [ ] Run backend full suite/Pint, client tests/lint/typecheck/Expo doctor/export, and real HTTP multi-user/retry smoke. Fix justified findings and rerun affected checks.
-- [ ] Request one independent final review against AGENTS/spec; address material findings with regression tests. Document runtime commands, device API URL, mail inbox/log access and honest device-test limits. No merge/push/deploy.
+- [x] Write failing reminder-policy tests for one-day scheduling, overdue/late trigger skipping, completion/removal/account switch cancellation and duplicate/restart stability.
+- [x] Implement Expo Notifications permission/channel behavior and reconciliation; use stable IDs in the operating system scheduler and cancel stale reminders. Permission denial leaves CRUD usable.
+- [x] Run backend full suite/Pint, client tests/lint/typecheck/Expo doctor/export, and real HTTP multi-user/retry smoke. Fix justified findings and rerun affected checks.
+- [x] Request one independent final review against AGENTS/spec; address material findings with regression tests. Document runtime commands, device API URL, mail inbox/log access and honest device-test limits. No merge/push/deploy.
 
 ## Execution rulings
 
