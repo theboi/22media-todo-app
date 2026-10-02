@@ -1,0 +1,8 @@
+.env
+.env.*
+!.env.example
+
+.agents/*
+!.agents/skills/
+.agents/skills/*
+!.agents/skills/claude-design
