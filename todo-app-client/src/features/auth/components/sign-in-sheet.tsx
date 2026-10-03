@@ -11,6 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { ScrollView, Text, View, useWindowDimensions } from "react-native";
 import { useTheme } from "expo-router";
+import { recoverAccountQueries } from "@/lib/auth/query-recovery";
 import { auth } from "@/lib/auth/session";
 import { useSurfaceColors } from "@/hooks/use-surface-colors";
 
@@ -43,12 +44,7 @@ function SignInForm({ onComplete }: { onComplete(): void }) {
       setPassword("");
       onComplete();
     },
-    onError: () => {
-      void queryClient.invalidateQueries({ queryKey: ["todo-lists"] });
-      void queryClient.invalidateQueries({ queryKey: ["auth", "session"] });
-      void queryClient.invalidateQueries({ queryKey: ["todos"] });
-      void queryClient.invalidateQueries({ queryKey: ["pinned-lists"] });
-    },
+    onError: () => recoverAccountQueries(queryClient),
   });
   let submitLabel = signUp ? "Sign Up" : "Sign In";
   if (login.isPending) submitLabel = "Please wait…";
