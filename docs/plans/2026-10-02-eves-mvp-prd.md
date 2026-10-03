@@ -1,7 +1,7 @@
 # Eves MVP — Product Requirements
 
 Date: 2026-10-02
-Status: Discovery complete; API contract v1 revised and fixed throughout MVP. No implementation requested.
+Status: Implementation in progress; API contract stays v1 throughout MVP. Screen refinements confirmed October 4, 2026.
 
 ## Purpose and scope
 
@@ -31,7 +31,7 @@ Below Outstanding, show selected list sections containing outstanding todos. Acc
 
 ### Lists — tab position 1
 
-Grid displays accessible list names, icons and colors. Open list detail to view todos, add/edit todos, toggle completion, and delete todos. Completed todos remain available in list detail but are excluded from Home outstanding sections. Minimal detail design: separate outstanding and completed groups and use the same creation/edit form for name, optional description and optional exact deadline.
+Grid displays accessible list names and white icons directly on each card’s list color. A Plus button in the top-right navigation header opens list creation. Long press offers Share and Delete; only Delete is currently implemented in the client. Open list detail to view todos, add/edit todos, toggle completion, and delete todos. Completed todos remain available in list detail but are excluded from Home outstanding sections. Detail uses a native Expo UI List with a right-aligned checkmark.circle.fill completion control. The top-right header Plus opens todo creation. Incomplete todos appear first, sorted by deadline ascending (undated last), then created_at descending, then ID. Completed todos are grey and follow, sorted by server-owned completed_at ascending, then ID. Reopening clears completed_at; subsequent completion records a new time, while unrelated edits preserve it. The creation/edit form supports name, optional description and optional exact deadline. Home reuses the same extended List presentation, retaining its own Outstanding ordering and completed-todo exclusion.
 
 Owner may edit list name/description/icon/color online, delete lists online, and manage sharing. Confirm deletion of a nonempty list; deleting it removes its todos. Members may manage todos and leave; no ownership transfer. List creation is allowed offline; cancelling an unsynchronized list removes its creation and dependent todo actions.
 
@@ -39,7 +39,7 @@ Pending shares appear under Lists with accept/decline. Owner can revoke pending 
 
 ### Settings — tab position 3
 
-Guests see Sign in; registered users see Sign out. Before account switching or sign-out, synchronize pending edits or require explicit discard. Clear outgoing account cache and scheduled reminders. Sign-out creates a fresh device-bound guest account; the MVP does not restore previous guest accounts. First provisioning of that new account requires connectivity, consistent with the first-launch rule. Onboarding does not repeat.
+The first native List item shows “Guest Account” for guests or the registered email. Authentication actions are in a separate Section below: guests see Sign In; registered users see Sign Out. The sign-in sheet includes “Don’t have an account? Sign Up”, with Sign Up underlined. Before account switching or sign-out, synchronize pending edits or require explicit discard. Clear outgoing account cache and scheduled reminders. Sign-out creates a fresh device-bound guest account; the MVP does not restore previous guest accounts. First provisioning of that new account requires connectivity, consistent with the first-launch rule. Onboarding does not repeat.
 
 ## Accounts and authentication
 
@@ -61,7 +61,7 @@ This defines product entities. The [frozen API contract v1](2026-10-02-eves-api-
 | accounts | id, nullable user_id, nullable first_device; exactly one non-null; one registered account per user |
 | user_settings | account_id, list_view_layout JSON array of list IDs |
 | todo_lists | id, owner_account_id, name, optional description, icon, color, shared_emails JSON, timestamps |
-| todos | id, todo_list_id, name, optional description, is_done boolean, optional deadline, timestamps; server-owned version revision for device comparison |
+| todos | id, todo_list_id, name, optional description, is_done boolean, optional deadline, nullable server-owned completed_at, timestamps; server-owned version revision for device comparison |
 | mutation receipts | account-scoped request key/fingerprint, success status and resource ID; retries do not retain deleted-resource bodies or version history |
 
 Use outstanding/completed as UI labels derived from is_done; avoid storing an independent status that can disagree. User list IDs are discovery indexes, never proof of access. pending_shares contains list ID and sharing user; reconcile it when recipients register/sign in. Account-scoped settings support guest layouts and registered cross-device layout sync.
