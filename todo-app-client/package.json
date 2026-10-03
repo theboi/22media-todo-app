@@ -44,7 +44,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "test": "node --import tsx --test src/lib/auth/*.test.mjs src/lib/api/*.test.mjs"
+    "test": "node --import tsx --test src/lib/auth/*.test.mjs src/lib/api/*.test.mjs src/features/todos/*.test.mjs"
   },
   "private": true
 }

@@ -19,7 +19,7 @@ export const request = async (
   token: string | null,
   signal: AbortSignal,
   body?: object,
-  operation?: { method: "POST" | "DELETE"; key: string },
+  operation?: { method: "POST" | "PATCH" | "DELETE"; key: string },
 ): Promise<unknown> => {
   let response: Response;
   try {

@@ -37,6 +37,9 @@ test("detail preserves todo completion and rejects malformed todos", () => {
         description: null,
         is_done: false,
         deadline: null,
+        todo_list_id: "list-id",
+        created_at: "2026-10-03T12:00:00Z",
+        completed_at: null,
       },
     ],
   };
@@ -48,5 +51,22 @@ test("detail preserves todo completion and rejects malformed todos", () => {
         todos: [{ ...list.todos[0], is_done: "false" }],
       }),
     /invalid todo/,
+  );
+});
+
+test("PATCH completion sends false explicitly and preserves its retry key", async (t) => {
+  t.mock.method(globalThis, "fetch", async (url, init) => {
+    assert.equal(init.method, "PATCH");
+    assert.deepEqual(JSON.parse(init.body), { is_done: false });
+    assert.equal(init.headers["Idempotency-Key"], "completion-key");
+    return Response.json({ data: { is_done: false } });
+  });
+  await request(
+    "http://test",
+    "/todos/id",
+    "token",
+    new AbortController().signal,
+    { is_done: false },
+    { method: "PATCH", key: "completion-key" },
   );
 });

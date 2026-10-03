@@ -3,11 +3,11 @@ import { API_URL } from "./config";
 import { auth } from "@/lib/auth/session";
 import { readListDetail } from "./list-detail";
 
-const listRequest = async (
+export const apiRequest = async (
   path: string,
   signal?: AbortSignal,
   body?: object,
-  operation?: { method: "POST" | "DELETE"; key: string },
+  operation?: { method: "POST" | "PATCH" | "DELETE"; key: string },
 ) => {
   const controller = new AbortController();
   const cancel = () => controller.abort();
@@ -36,7 +36,7 @@ const listRequest = async (
   }
 };
 export const fetchLists = async (signal: AbortSignal) =>
-  readLists(await listRequest("/todo-lists", signal));
+  readLists(await apiRequest("/todo-lists", signal));
 export const createList = async (input: {
   id: string;
   name: string;
@@ -45,13 +45,13 @@ export const createList = async (input: {
 }) => {
   const { key, ...body } = input;
   const [list] = readLists([
-    await listRequest("/todo-lists", undefined, body, { method: "POST", key }),
+    await apiRequest("/todo-lists", undefined, body, { method: "POST", key }),
   ]);
   if (!list) throw new Error("The server returned an invalid list.");
   return list;
 };
 export const deleteList = async ({ id, key }: { id: string; key: string }) => {
-  await listRequest(
+  await apiRequest(
     `/todo-lists/${encodeURIComponent(id)}`,
     undefined,
     undefined,
@@ -60,5 +60,5 @@ export const deleteList = async ({ id, key }: { id: string; key: string }) => {
 };
 export const fetchList = async (id: string, signal: AbortSignal) =>
   readListDetail(
-    await listRequest(`/todo-lists/${encodeURIComponent(id)}`, signal),
+    await apiRequest(`/todo-lists/${encodeURIComponent(id)}`, signal),
   );
