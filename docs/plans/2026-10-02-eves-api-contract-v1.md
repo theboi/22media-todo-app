@@ -10,7 +10,7 @@ Authority: This document defines the only client/server contract for the MVP and
 - **todo.version is a data revision, not the API version.** It starts at integer 1 and increments by one only when persisted editable todo values actually change. Unchanged PATCH/PUT and retries do not increment it. It must change for the requested device-side comparison to work. Lists/settings have no version field.
 - Protected routes require `Authorization: Bearer <token>`. Use JSON and `Accept: application/json`; request bodies require `Content-Type: application/json`. HTTPS except local development.
 - IDs are lowercase UUID v4 strings for accounts, users, lists, todos, shares, device identifiers and operation keys. Clients generate list/todo IDs, including conflict-copy IDs, before sending creates. Server generates account/user/share IDs. No integer mapping.
-- Timestamp output: UTC ISO 8601 milliseconds, e.g. `2026-10-02T04:00:00.000Z`. Deadline input must include an explicit timezone offset and normalizes to UTC milliseconds. Server owns created_at/updated_at. Offline creation ordering is provisional until acknowledged.
+- Timestamp output: UTC ISO 8601 milliseconds, e.g. `2026-10-02T04:00:00.000Z`. Deadline input must include an explicit timezone offset and normalizes to UTC milliseconds. Server owns created_at/updated_at/completed_at. Offline creation ordering is provisional until acknowledged.
 - Single responses: `{data: Resource}`; collection responses: `{data: Resource[]}`. No mutation metadata or pagination envelope. Token and snapshot shapes below are explicit exceptions. DELETE/logout/decline/leave successes return 204 with no body.
 - Unknown JSON/query fields return 422. Missing differs from null. Boolean input must be JSON true/false. No client-controlled owner, role, timestamps, user identity or todo revision.
 - Every GET supports HEAD with identical authorization/status/headers and no body. No HEAD aliases for POST routes. Private/auth responses use `Cache-Control: no-store`.
@@ -92,12 +92,15 @@ role=owner|member, relative to caller. GET list detail adds todos: Todo[]; other
   "name": "Submit assignment",
   "description": null,
   "is_done": false,
+  "completed_at": null,
   "deadline": "2026-10-05T09:00:00.000Z",
   "version": 1,
   "created_at": "2026-10-02T04:00:00.000Z",
   "updated_at": "2026-10-02T04:00:00.000Z"
 }
 ```
+
+`completed_at` is a server-owned nullable UTC timestamp. Creating a done todo or transitioning false → true sets it to server time; true → false clears it. Unchanged completion and unrelated edits preserve it. Existing completed records are backfilled from their last update because historical completion times were not recorded. Detail sorts incomplete todos by deadline ascending (undated last), then created_at descending, then id. Completed todos follow, by completed_at ascending, then id. Home Outstanding retains deadline then created_at ascending.
 
 Editable fields: name, description, is_done, deadline. todo_list_id is immutable after creation. No separate status/list_id/title/conflict_of field. Conflict-copy identification is local UI state, keyed by client-generated new todo ID; server treats a copy as an ordinary todo.
 

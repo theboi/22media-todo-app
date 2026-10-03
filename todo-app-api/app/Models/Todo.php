@@ -17,7 +17,7 @@ class Todo extends Model
 
     protected function casts(): array
     {
-        return ['is_done' => 'boolean', 'deadline' => 'datetime', 'version' => 'integer'];
+        return ['is_done' => 'boolean', 'deadline' => 'datetime', 'completed_at' => 'datetime', 'version' => 'integer'];
     }
 
     public function todoList(): BelongsTo

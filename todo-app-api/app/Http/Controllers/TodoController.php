@@ -43,13 +43,16 @@ class TodoController extends Controller
             throw new ApiError('ID_ALREADY_EXISTS', 409);
         }
 
-        return (new TodoResource(Todo::create($p + ['description' => null, 'is_done' => false, 'deadline' => null, 'version' => 1])))->response()->setStatusCode(201);
+        return (new TodoResource(Todo::create($p + ['description' => null, 'is_done' => false, 'deadline' => null, 'version' => 1, 'completed_at' => ($p['is_done'] ?? false) ? now() : null])))->response()->setStatusCode(201);
     }
 
     public function update(ApiRequest $r, string $id): TodoResource
     {
         $todo = Access::todo($r->user(), $id);
         $todo->fill($r->payload());
+        if ($todo->isDirty('is_done')) {
+            $todo->completed_at = $todo->is_done ? now() : null;
+        }
         if ($todo->isDirty(['name', 'description', 'is_done', 'deadline'])) {
             $todo->version++;
             $todo->save();
