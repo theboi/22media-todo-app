@@ -29,18 +29,14 @@ export default function ListsScreen() {
   const cardWidth = (Math.min(width, 720) - 40 - 12 * (columns - 1)) / columns;
   const {
     data: lists = [],
-    isPending,
-    isFetching,
-    error,
-    refetch,
-    fetchStatus,
+    ...query
   } = useQuery({
     queryKey: ["todo-lists"],
     queryFn: ({ signal }) => fetchLists(signal),
     staleTime: 30_000,
     retry: false,
   });
-  const paused = isPending && fetchStatus === "paused";
+  const paused = query.isPending && query.fetchStatus === "paused";
 
   return (
     <View style={{ flex: 1, backgroundColor: surface.background }}>
@@ -69,10 +65,10 @@ export default function ListsScreen() {
           alignSelf: "center",
         }}
         ListHeaderComponent={
-          error && (
+          query.error && (
             <ListsErrorState
-              message={error.message}
-              onRetry={() => void refetch()}
+              message={query.error.message}
+              onRetry={() => void query.refetch()}
             />
           )
         }
@@ -80,20 +76,20 @@ export default function ListsScreen() {
           paused ? (
             <ListsErrorState
               message="You’re offline. Reconnect to load your lists."
-              onRetry={() => void refetch()}
+              onRetry={() => void query.refetch()}
             />
-          ) : isPending ? (
+          ) : query.isPending ? (
             <ActivityIndicator
               accessibilityLabel="Loading lists"
               color={colors.primary}
               style={{ marginTop: 64 }}
             />
-          ) : !error ? (
+          ) : !query.error ? (
             <ListsEmptyState />
           ) : null
         }
-        refreshing={isFetching && !isPending}
-        onRefresh={() => void refetch()}
+        refreshing={query.isFetching && !query.isPending}
+        onRefresh={() => void query.refetch()}
         contentInsetAdjustmentBehavior="automatic"
       />
       {creating && <CreateListSheet onDismiss={() => setCreating(false)} />}
