@@ -1,4 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
+import { Stack } from "expo-router/stack";
+import { PlusButton } from "@/components/plus-button";
 import { useTheme } from "expo-router";
 import { useSurfaceColors } from "@/hooks/use-surface-colors";
 import {
@@ -40,6 +42,7 @@ export default function ListsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: surface.background }}>
+      <Stack.Screen options={{ headerRight: () => <PlusButton label="New list" onPress={() => setCreating(true)} /> }} />
       <FlatList
         key={columns}
         data={lists}

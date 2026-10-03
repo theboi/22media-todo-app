@@ -23,7 +23,10 @@ export function CreateListSheet({ onDismiss }: { onDismiss(): void }) {
   const create = useMutation({
     mutationFn: createList,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["todo-lists"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["todo-lists"] }),
+        queryClient.invalidateQueries({ queryKey: ["pinned-lists"] }),
+      ]);
       onDismiss();
     },
   });

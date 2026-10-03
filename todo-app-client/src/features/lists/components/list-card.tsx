@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "expo-router";
 import { Platform, Pressable, Text, View } from "react-native";
 import { ListIcon } from "./list-icon";
@@ -12,6 +13,7 @@ export function ListCard({
   onActions(): void;
   onDelete(): void;
 }) {
+  const [pressed, setPressed] = useState(false);
   const rgb = list.color.slice(1).match(/.{2}/g) ?? [];
   const [r = 0, g = 0, b = 0] = rgb.map((hex) => {
     const c = parseInt(hex, 16) / 255;
@@ -25,15 +27,17 @@ export function ListCard({
       accessibilityLabel={`${list.name}, ${list.role === "owner" ? "Your list" : "Shared with you"}`}
       accessibilityHint="Opens this list. Long press for actions."
       onLongPress={Platform.OS === "ios" ? undefined : onActions}
-      style={({ pressed }) => ({
-        height: 164,
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
+      style={{
+        minHeight: 164,
         padding: 16,
         gap: 22,
         borderRadius: 20,
         borderCurve: "continuous",
-        backgroundColor: "red",
+        backgroundColor: list.color,
         opacity: pressed ? 0.8 : 1,
-      })}
+      }}
     >
       <ListIcon name={list.icon} color="#FFFFFF" size={32} />
       <View style={{ gap: 6 }}>

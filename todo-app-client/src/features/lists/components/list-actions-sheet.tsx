@@ -25,7 +25,11 @@ export function ListActionsSheet({
     onSuccess: async () => {
       await queryClient.cancelQueries({ queryKey: ["list", list.id] });
       queryClient.removeQueries({ queryKey: ["list", list.id] });
-      await queryClient.invalidateQueries({ queryKey: ["todo-lists"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["todo-lists"] }),
+        queryClient.invalidateQueries({ queryKey: ["todos"] }),
+        queryClient.invalidateQueries({ queryKey: ["pinned-lists"] }),
+      ]);
       await queryClient.invalidateQueries({ queryKey: ["auth", "session"] });
       onDismiss();
     },
