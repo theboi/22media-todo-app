@@ -66,6 +66,7 @@ export const createAuthClient = ({
           "Cannot reach Eves. Check your connection and try again.",
         );
       }
+      if (response.ok && response.status === 204) return undefined;
       const payload: unknown = await response.json();
       const data = record(payload);
       if (!response.ok) {
@@ -73,6 +74,8 @@ export const createAuthClient = ({
         const code =
           typeof error.code === "string" ? error.code : "REQUEST_FAILED";
         const messages: Record<string, string> = {
+          EMAIL_ALREADY_REGISTERED:
+            "This email already has an account. Sign in instead.",
           INVALID_CREDENTIALS: "The email or password is incorrect.",
           UNAUTHENTICATED: "Your session is no longer valid.",
           ALREADY_REGISTERED: "You are already signed in.",
@@ -143,6 +146,32 @@ export const createAuthClient = ({
   };
   return {
     getToken,
+    signOut: async (): Promise<AuthSession> => {
+      const token = await storage.get("eves.token");
+      if (token) {
+        try {
+          await send("/auth/logout", token, {});
+        } catch (error) {
+          if (!(error instanceof AuthError && error.code === "UNAUTHENTICATED")) throw error;
+        }
+      }
+      await storage.set("eves.token", "");
+      return parseSession(await send("/auth/me", await getToken()));
+    },
+    signUp: async (
+      email: string,
+      password: string,
+      confirmation: string,
+    ): Promise<AuthSession> =>
+      (
+        await install(
+          await send("/auth/register", await getToken(), {
+            email: email.trim().toLowerCase(),
+            password,
+            password_confirmation: confirmation,
+          }),
+        )
+      ).session,
     getSession: async (): Promise<AuthSession> =>
       parseSession(await send("/auth/me", await getToken())),
     signIn: async (email: string, password: string): Promise<AuthSession> => {

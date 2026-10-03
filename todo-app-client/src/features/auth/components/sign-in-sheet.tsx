@@ -15,6 +15,8 @@ import { auth } from "@/lib/auth/session";
 import { useSurfaceColors } from "@/hooks/use-surface-colors";
 
 function SignInForm({ onComplete }: { onComplete(): void }) {
+  const [signUp, setSignUp] = useState(false);
+  const [confirmation, setConfirmation] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const queryClient = useQueryClient();
@@ -22,22 +24,34 @@ function SignInForm({ onComplete }: { onComplete(): void }) {
   const { colors: theme } = useTheme();
   const { height, width } = useWindowDimensions();
   const login = useMutation({
+    networkMode: "always",
     mutationFn: async () => {
       await queryClient.cancelQueries();
-      return auth.signIn(email, password);
+      return signUp
+        ? auth.signUp(email, password, confirmation)
+        : auth.signIn(email, password);
     },
     onSuccess: async (session) => {
       queryClient.setQueryData(["auth", "session"], session);
-      queryClient.removeQueries({ queryKey: ["list"] });
-      await queryClient.resetQueries({ queryKey: ["todo-lists"] });
+
+      await Promise.all([
+        queryClient.resetQueries({ queryKey: ["list"] }),
+        queryClient.resetQueries({ queryKey: ["todo-lists"] }),
+        queryClient.resetQueries({ queryKey: ["todos"] }),
+        queryClient.resetQueries({ queryKey: ["pinned-lists"] }),
+      ]);
       setPassword("");
       onComplete();
     },
     onError: () => {
       void queryClient.invalidateQueries({ queryKey: ["todo-lists"] });
       void queryClient.invalidateQueries({ queryKey: ["auth", "session"] });
+      void queryClient.invalidateQueries({ queryKey: ["todos"] });
+      void queryClient.invalidateQueries({ queryKey: ["pinned-lists"] });
     },
   });
+  let submitLabel = signUp ? "Sign Up" : "Sign In";
+  if (login.isPending) submitLabel = "Please wait…";
   return (
     <BottomSheet
       isPresented
@@ -63,11 +77,12 @@ function SignInForm({ onComplete }: { onComplete(): void }) {
               accessibilityRole="header"
               style={{ color: colors.text, fontSize: 28, fontWeight: "700" }}
             >
-              Sign In
+              {signUp ? "Sign Up" : "Sign In"}
             </Text>
             <Text style={{ color: colors.secondaryText }}>
-              Sign in to your email account. Your device lists will be replaced,
-              not merged.
+              {signUp
+                ? "Create an email account and keep your device lists."
+                : "Sign in to your email account. Your device lists will be replaced, not merged."}
             </Text>
             <Text style={{ color: colors.text }}>Email</Text>
             <Host matchContents seedColor={theme.primary}>
@@ -83,12 +98,16 @@ function SignInForm({ onComplete }: { onComplete(): void }) {
               />
             </Host>
             <Text style={{ color: colors.text }}>Password</Text>
-            <Host matchContents seedColor={theme.primary}>
+            <Host
+              key={signUp ? "signup-password" : "signin-password"}
+              matchContents
+              seedColor={theme.primary}
+            >
               {/* On iOS this renders SwiftUI SecureField; Android uses native password masking. */}
               <TextInput
                 placeholder="Password"
                 secureTextEntry
-                autoComplete="current-password"
+                autoComplete={signUp ? "new-password" : "current-password"}
                 autoCapitalize="none"
                 autoCorrect={false}
                 onChangeText={setPassword}
@@ -96,11 +115,31 @@ function SignInForm({ onComplete }: { onComplete(): void }) {
                 maxLength={128}
                 returnKeyType="go"
                 onSubmitEditing={() => {
-                  if (email.trim() && password.length >= 8 && !login.isPending)
+                  if (
+                    email.trim() &&
+                    password.length >= 8 &&
+                    (!signUp || confirmation === password) &&
+                    !login.isPending
+                  )
                     login.mutate();
                 }}
               />
             </Host>
+            {signUp && (
+              <>
+                <Text style={{ color: colors.text }}>Confirm password</Text>
+                <Host matchContents>
+                  <TextInput
+                    placeholder="Confirm password"
+                    secureTextEntry
+                    autoComplete="new-password"
+                    onChangeText={setConfirmation}
+                    editable={!login.isPending}
+                    maxLength={128}
+                  />
+                </Host>
+              </>
+            )}
             {login.error && (
               <Text
                 selectable
@@ -110,12 +149,40 @@ function SignInForm({ onComplete }: { onComplete(): void }) {
                 {login.error.message}
               </Text>
             )}
+            <View
+              style={{ flexDirection: "row", justifyContent: "center", gap: 5 }}
+            >
+              <Text style={{ color: colors.text }}>
+                {signUp ? "Already have an account?" : "Don’t have an account?"}
+              </Text>
+              <Text
+                accessibilityRole="button"
+                accessibilityState={{ disabled: login.isPending }}
+                onPress={() => {
+                  if (!login.isPending) {
+                    setSignUp(!signUp);
+                    setPassword("");
+                    setConfirmation("");
+                    login.reset();
+                  }
+                }}
+                style={{
+                  color: theme.primary,
+                  textDecorationLine: "underline",
+                }}
+              >
+                {signUp ? "Sign In" : "Sign Up"}
+              </Text>
+            </View>
             <Host matchContents seedColor={theme.primary}>
               <Column spacing={12}>
                 <Button
-                  label={login.isPending ? "Signing in…" : "Sign In"}
+                  label={submitLabel}
                   disabled={
-                    login.isPending || !email.trim() || password.length < 8
+                    login.isPending ||
+                    !email.trim() ||
+                    password.length < 8 ||
+                    (signUp && confirmation !== password)
                   }
                   onPress={() => login.mutate()}
                 />
