@@ -1,4 +1,6 @@
-import { Button, Column, ListItem, Text } from "@expo/ui";
+import { ListItem, Text } from "@expo/ui";
+import { Stack } from "expo-router/stack";
+import { PinButton } from "@/features/home/components/pin-button";
 import { useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -7,7 +9,7 @@ import { fetchLists } from "@/lib/api/todo-lists";
 import { fetchTodos, fetchPinnedLists } from "@/lib/api/todos";
 import { outstandingTodos } from "@/lib/api/home-data";
 import { TodoList, type TodoListSection } from "@/features/todos/components/todo-list";
-import { PinListsSheet } from "@/features/home/components/pin-lists-sheet";
+import { PinListsSheet } from "@/features/lists/components/pin-lists-sheet";
 import { useSurfaceColors } from "@/hooks/use-surface-colors";
 
 export default function HomeScreen() {
@@ -63,20 +65,13 @@ export default function HomeScreen() {
   else if (loading) status = paused ? "You’re offline. Reconnect to load Home." : "Loading Home…";
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <Stack.Screen options={{ headerRight: () => <PinButton disabled={!lists.data || !pins.data} onPress={() => setPinning(true)} /> }} />
       <TodoList
         sections={todos.data ? sections : []}
         onRefresh={refresh}
         header={
           <>
-            <Column spacing={12} style={{ padding: 16 }}>
-              <Text textStyle={{ fontSize: 32, fontWeight: "bold" }}>Home</Text>
-              <Button
-                label="Pin Lists"
-                variant="text"
-                disabled={!lists.data || !pins.data}
-                onPress={() => setPinning(true)}
-              />
-            </Column>
+
             {status && <ListItem onPress={error ? () => void refresh() : undefined}><Text>{status}</Text></ListItem>}
           </>
         }
