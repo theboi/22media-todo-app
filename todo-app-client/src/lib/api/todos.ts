@@ -13,7 +13,7 @@ export const createTodo = async (input: {
     await apiRequest(
       "/todos",
       undefined,
-      { id: input.id, todo_list_id: input.listId, name: input.name },
+      { id: input.id, todo_list_id: input.listId, name: input.name, is_done: false },
       { method: "POST", key: input.key },
     ),
   );

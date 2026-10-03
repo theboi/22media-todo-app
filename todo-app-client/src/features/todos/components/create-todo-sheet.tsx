@@ -1,8 +1,9 @@
-import { BottomSheet, Button, Column, Text, TextInput } from "@expo/ui";
+import { BottomSheet, FieldGroup, TextInput } from "@expo/ui";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { useRef, useState } from "react";
 import { createTodo } from "@/lib/api/todos";
+import { SheetForm } from "@/components/ui/sheet-form";
 import { sheetDismissModifiers } from "@/components/ui/sheet-modifiers";
 export function CreateTodoSheet({
   listId,
@@ -45,31 +46,28 @@ export function CreateTodoSheet({
       modifiers={sheetDismissModifiers(create.isPending)}
       shouldDismissOnBackPress={!create.isPending}
       shouldDismissOnClickOutside={!create.isPending}
-      snapPoints={["half", "full"]}
+      snapPoints={["full"]}
     >
-      <Column spacing={20} style={{ padding: 24 }}>
-        <Text textStyle={{ fontSize: 24, fontWeight: "bold" }}>New Todo</Text>
-        <TextInput
-          placeholder="What needs doing?"
-          onChangeText={setName}
-          maxLength={200}
-          editable={!create.isPending}
-          returnKeyType="done"
-          onSubmitEditing={submit}
-        />
-        {create.error && <Text>{create.error.message}</Text>}
-        <Button
-          label={create.isPending ? "Adding…" : "Add Todo"}
-          disabled={!name.trim() || create.isPending}
-          onPress={submit}
-        />
-        <Button
-          label="Cancel"
-          variant="text"
-          disabled={create.isPending}
-          onPress={onDismiss}
-        />
-      </Column>
+      <SheetForm
+        title="New Todo"
+        error={create.error?.message}
+        submitLabel={create.isPending ? "Adding…" : "Add Todo"}
+        disabled={!name.trim() || create.isPending}
+        pending={create.isPending}
+        onSubmit={submit}
+        onCancel={onDismiss}
+      >
+        <FieldGroup.Section title="Todo name">
+          <TextInput
+            placeholder="What needs doing?"
+            onChangeText={setName}
+            maxLength={200}
+            editable={!create.isPending}
+            returnKeyType="done"
+            onSubmitEditing={submit}
+          />
+        </FieldGroup.Section>
+      </SheetForm>
     </BottomSheet>
   );
 }
