@@ -60,3 +60,12 @@
 - Verification: 20 client tests; client lint/typecheck; 15 API tests and Pint; iOS and Android exports. Physical-device layout has not been visually verified.
 - Ruling: implement registered Sign Out in the Settings section — required by the reread PRD, and showing guest-only Sign In to a registered account would fail API authorization.
 - Final review found failed authentication could strand a canceled retained detail query. Fixed in `e3b4b8e`; real QueryClient/QueryObserver regression failed before the fix, passes after it, and targeted reviewer verification found no remaining issue.
+
+## Follow-up interaction fixes
+
+- `205f0dd`: Todo row and checkbox share a synchronous guarded toggle; newly created todos explicitly send is_done=false and render an empty circle. Create Todo now uses the shared native List form.
+- `04a2ee2`: Create List uses native List sections for name/icon/color, including the eight API-supported icons. Lists now composes the shared responsive ListGrid and selectable ListCard.
+- `6d2f1ce`: Home has a native Stack large-title header with a right-side Pin icon. PinListsSheet shares ListGrid/ListCard, excludes existing pins, appends selected accessible IDs, and preserves pin order. The sheet lives with the list components to avoid feature-internal imports.
+- Browser reproduction: title taps did nothing before the toggle fix. Afterward, row and checkbox each changed the database revision once; a completed demo task was reopened and restored.
+- Seeded Reading (Book icon, Mint color) and Read one chapter through the app to verify forms end to end. Reading was appended after the existing Weekend pin, and the picker then showed all lists already pinned. The new todo persisted with is_done=false, completed_at=null, version=1.
+- Final checks: 23 client tests, typecheck, lint, and fresh iOS/Android exports passed. A targeted reviewer found no further Important/Critical issues. Physical-device gestures and large-title rendering remain unverified.
