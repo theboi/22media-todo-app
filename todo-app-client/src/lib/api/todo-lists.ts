@@ -41,6 +41,7 @@ export const createList = async (input: {
   id: string;
   name: string;
   color: string;
+  icon: string;
   key: string;
 }) => {
   const { key, ...body } = input;

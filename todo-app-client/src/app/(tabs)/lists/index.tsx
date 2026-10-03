@@ -5,10 +5,9 @@ import { useTheme } from "expo-router";
 import { useSurfaceColors } from "@/hooks/use-surface-colors";
 import {
   ActivityIndicator,
-  FlatList,
   View,
-  useWindowDimensions,
 } from "react-native";
+import { ListGrid } from "@/features/lists/components/list-grid";
 import { ListCard } from "@/features/lists/components/list-card";
 import { ListsEmptyState } from "@/features/lists/components/lists-empty-state";
 import { ListsErrorState } from "@/features/lists/components/lists-error-state";
@@ -26,9 +25,6 @@ export default function ListsScreen() {
   } | null>(null);
   const { colors } = useTheme();
   const surface = useSurfaceColors();
-  const { width, fontScale } = useWindowDimensions();
-  const columns = width < 360 || fontScale > 1.4 ? 1 : 2;
-  const cardWidth = (Math.min(width, 720) - 40 - 12 * (columns - 1)) / columns;
   const {
     data: lists = [],
     ...query
@@ -43,39 +39,24 @@ export default function ListsScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: surface.background }}>
       <Stack.Screen options={{ headerRight: () => <PlusButton label="New list" onPress={() => setCreating(true)} /> }} />
-      <FlatList
-        key={columns}
-        data={lists}
-        numColumns={columns}
-        keyExtractor={(list) => list.id}
-        renderItem={({ item }) => (
-          <View style={{ width: cardWidth }}>
-            <ListCard
-              list={item}
-              onActions={() => setSelected({ list: item, confirm: false })}
-              onDelete={() => setSelected({ list: item, confirm: true })}
-            />
-          </View>
+      <ListGrid
+        lists={lists}
+        renderCard={(list) => (
+          <ListCard
+            list={list}
+            onActions={() => setSelected({ list, confirm: false })}
+            onDelete={() => setSelected({ list, confirm: true })}
+          />
         )}
-        columnWrapperStyle={columns > 1 ? { gap: 12 } : undefined}
-        contentContainerStyle={{
-          padding: 20,
-          paddingTop: 20,
-          gap: 12,
-          flexGrow: 1,
-          width: "100%",
-          maxWidth: 720,
-          alignSelf: "center",
-        }}
-        ListHeaderComponent={
-          query.error && (
+        header={
+          query.error ? (
             <ListsErrorState
               message={query.error.message}
               onRetry={() => void query.refetch()}
             />
-          )
+          ) : null
         }
-        ListEmptyComponent={
+        empty={
           paused ? (
             <ListsErrorState
               message="You’re offline. Reconnect to load your lists."
@@ -93,7 +74,6 @@ export default function ListsScreen() {
         }
         refreshing={query.isFetching && !query.isPending}
         onRefresh={() => void query.refetch()}
-        contentInsetAdjustmentBehavior="automatic"
       />
       {creating && <CreateListSheet onDismiss={() => setCreating(false)} />}
       {selected && (
