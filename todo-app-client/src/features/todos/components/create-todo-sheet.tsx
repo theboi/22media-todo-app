@@ -25,7 +25,6 @@ export function CreateTodoSheet({
         queryClient.invalidateQueries({ queryKey: ["list", listId] }),
         queryClient.invalidateQueries({ queryKey: ["todos"] }),
       ]);
-      onDismiss();
     },
   });
   const submit = () => {
@@ -38,7 +37,7 @@ export function CreateTodoSheet({
         name: name.trim(),
         deadline: deadline?.toISOString() ?? null,
       };
-    create.mutate(attempt.current);
+    create.mutate(attempt.current, { onSuccess: onDismiss });
   };
   return (
     <SheetForm

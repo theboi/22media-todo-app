@@ -1,9 +1,9 @@
-import { ListItem, Text } from "@expo/ui";
+import { ListItem, RNHostView, Text } from "@expo/ui";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { useRef } from "react";
 import { SymbolView } from "expo-symbols";
-import { Pressable } from "react-native";
+import { Platform, Pressable } from "react-native";
 import { useTheme, useRouter } from "expo-router";
 import { SwipeDelete } from "@/components/ui/swipe-delete";
 import { invalidateList } from "@/lib/api/invalidate-list";
@@ -43,11 +43,7 @@ export function TodoRow({ todo }: { todo: Todo }) {
     completion.error?.message,
     remove.error?.message,
   ].filter(Boolean).join(" · ");
-  return (
-    <SwipeDelete disabled={busy} onDelete={() => { if (inFlight.current) return; inFlight.current = true; remove.mutate({ id: todo.id, key: randomUUID() }); }}>
-    <ListItem
-      supportingText={supporting !== "" ? <Text onPress={edit} textStyle={{ fontSize: 13, color: "#8E8E93" }}>{supporting}</Text> : null}
-      trailing={
+  const checkbox = (
         <Pressable
           accessibilityRole="checkbox"
           aria-checked={todo.isDone}
@@ -73,6 +69,13 @@ export function TodoRow({ todo }: { todo: Todo }) {
             accessible={false}
           />
         </Pressable>
+  );
+  return (
+    <SwipeDelete disabled={busy} onDelete={() => { if (inFlight.current) return; inFlight.current = true; remove.mutate({ id: todo.id, key: randomUUID() }); }}>
+    <ListItem
+      supportingText={supporting !== "" ? <Text onPress={edit} textStyle={{ fontSize: 13, color: "#8E8E93" }}>{supporting}</Text> : null}
+      trailing={
+        Platform.OS === "android" ? <RNHostView matchContents>{checkbox}</RNHostView> : checkbox
       }
     >
       <Text onPress={edit} textStyle={todo.isDone ? { color: "#8E8E93" } : undefined}>{todo.name}</Text>

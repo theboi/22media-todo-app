@@ -14,13 +14,12 @@ export function EditTodoForm({ todo, onSaved }: { todo: Todo; onSaved(): void })
   const save = useMutation({ mutationFn: updateTodoDescription, networkMode: "always", onSuccess: async value => {
     client.setQueryData(["todo", todo.id], value);
     await invalidateList(client, todo.listId);
-    onSaved();
   } });
   const submit = () => {
     if (save.isPending) return;
     const value = description.trim() || null;
     if (!attempt.current || attempt.current.description !== value) attempt.current = { id: todo.id, description: value, key: randomUUID() };
-    save.mutate(attempt.current);
+    save.mutate(attempt.current, { onSuccess: onSaved });
   };
   return <SheetForm error={save.error?.message} submitLabel={save.isPending ? "Saving…" : "Save Todo"} disabled={save.isPending} pending={save.isPending} onSubmit={submit}>
     <FormField label="Description"><TextInput defaultValue={todo.description ?? ""} placeholder="Optional" textAlign="right" maxLength={5000} onChangeText={setDescription} editable={!save.isPending} /></FormField>
