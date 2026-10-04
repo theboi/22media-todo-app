@@ -18,12 +18,12 @@ export function PinListsSheet({ lists, pinned, onDismiss }: { lists: TodoList[];
   const colors = useSurfaceColors();
   const attempt = useRef<{ ids: string[]; key: string } | null>(null);
   const client = useQueryClient();
-  const save = useMutation({ mutationFn: savePinnedLists, networkMode: "always", onSuccess: value => { client.setQueryData(["pinned-lists"], value); onDismiss(); } });
+  const save = useMutation({ mutationFn: savePinnedLists, networkMode: "always", onSuccess: value => { client.setQueryData(["pinned-lists"], value); } });
   const submit = () => {
     if (save.isPending) return;
     const ids = selectedPins(lists, pinned, selected);
     if (!attempt.current || JSON.stringify(attempt.current.ids) !== JSON.stringify(ids)) attempt.current = { ids, key: randomUUID() };
-    save.mutate(attempt.current);
+    save.mutate(attempt.current, { onSuccess: onDismiss });
   };
   return <View style={{ flex: 1, backgroundColor: colors.background }} onLayout={event => setWidth(event.nativeEvent.layout.width)}>
     <ListGrid lists={lists} renderCard={list => <ListCard list={list} selected={selected.includes(list.id)} disabled={save.isPending} onSelect={() => setSelected(current => current.includes(list.id) ? current.filter(id => id !== list.id) : [...current, list.id])} />} empty={<Text style={{ color: colors.text }}>Create a list first in the Lists tab.</Text>} />
