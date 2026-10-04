@@ -1,31 +1,47 @@
-import { Button, Column, FieldGroup, List, Text } from "@expo/ui";
-import type * as React from "react";
-import { useWindowDimensions } from "react-native";
+import { Button, Column, FieldGroup, Host, Text } from "@expo/ui";
+import { Children, useState } from "react";
+import { View, useWindowDimensions } from "react-native";
 
-export function SheetForm({ title, children, error, submitLabel, disabled, pending, onSubmit, onCancel }: {
-  title: string;
+export function SheetForm({ children, error, submitLabel, disabled, pending, onSubmit }: {
   children: React.ReactNode;
   error?: string;
   submitLabel: string;
   disabled: boolean;
   pending: boolean;
   onSubmit(): void;
-  onCancel(): void;
 }) {
-  const { height } = useWindowDimensions();
+  const { fontScale, width: screenWidth } = useWindowDimensions();
+  const [width, setWidth] = useState(screenWidth);
   return (
-    <Column style={{ height: height * 0.8 }}>
-      <List>
-        <FieldGroup.Section>
-          <Text textStyle={{ fontSize: 24, fontWeight: "bold" }}>{title}</Text>
-        </FieldGroup.Section>
-        {children}
-        <FieldGroup.Section>
-          {error && <Text>{error}</Text>}
-          <Button label={submitLabel} disabled={disabled} onPress={onSubmit} />
-          <Button label="Cancel" variant="text" disabled={pending} onPress={onCancel} />
-        </FieldGroup.Section>
-      </List>
-    </Column>
+    <View
+      style={{ flex: 1 }}
+      onLayout={event => setWidth(event.nativeEvent.layout.width)}
+    >
+      <Host matchContents={{ vertical: true }} style={{ width: "100%" }}>
+        <Column spacing={8} style={{ width }}>
+          <FieldGroup
+            disabled={pending}
+            style={{ width, height: Children.count(children) * 64 * Math.max(1, fontScale) + 32 }}
+          >
+            {children}
+          </FieldGroup>
+          <Column spacing={12} style={{ paddingHorizontal: 16 }}>
+            {error ? <Text>{error}</Text> : null}
+            <Button
+              disabled={disabled}
+              onPress={onSubmit}
+              style={{ width: Math.max(0, width - 32), paddingVertical: 12 }}
+            >
+              <Text
+                style={{ width: Math.max(0, width - 64) }}
+                textStyle={{ textAlign: "center", fontWeight: "600" }}
+              >
+                {submitLabel}
+              </Text>
+            </Button>
+          </Column>
+        </Column>
+      </Host>
+    </View>
   );
 }
