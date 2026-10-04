@@ -20,11 +20,46 @@ export default function ListsLayout() {
       />
       <Stack.Screen
         name="add-todo"
-        options={{ title: "New Todo", presentation: "formSheet", sheetAllowedDetents: [0.4, 1], sheetGrabberVisible: true }}
+        options={{
+          title: "New Todo",
+          presentation: "formSheet",
+          sheetAllowedDetents: [0.4, 1],
+          sheetGrabberVisible: true,
+        }}
       />
-      <Stack.Screen name="edit" options={{ title: "Edit List", presentation: "formSheet", sheetAllowedDetents: [0.5, 1] }} />
-      <Stack.Screen name="share" options={{ title: "Share List", presentation: "formSheet", sheetAllowedDetents: [0.5, 1] }} />
-      <Stack.Screen name="verify-email" options={{ title: "Verify Email", presentation: "formSheet", sheetAllowedDetents: [0.5, 1] }} />
+      <Stack.Screen
+        name="edit-list"
+        options={{
+          title: "Edit List",
+          presentation: "formSheet",
+          sheetAllowedDetents: [0.5, 1],
+        }}
+      />
+      <Stack.Screen
+        name="share"
+        options={{
+          title: "Share List",
+          presentation: "formSheet",
+          sheetAllowedDetents: [0.5, 1],
+        }}
+      />
+      <Stack.Screen
+        name="verify-email"
+        options={{
+          title: "Verify Email",
+          presentation: "formSheet",
+          sheetAllowedDetents: [0.5, 1],
+        }}
+      />
+      <Stack.Screen
+        name="edit-todo"
+        options={{
+          title: "Edit Todo",
+          presentation: "formSheet",
+          sheetAllowedDetents: [0.5, 1],
+          sheetGrabberVisible: true,
+        }}
+      />
     </Stack>
   );
 }

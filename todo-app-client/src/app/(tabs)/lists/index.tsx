@@ -44,7 +44,7 @@ export default function ListsScreen() {
             list={list}
             onActions={() => setSelected({ list, confirm: false })}
             onDelete={() => setSelected({ list, confirm: true })}
-            onRename={() => router.push({ pathname: "/(tabs)/lists/edit", params: { listId: list.id } })}
+            onRename={() => router.push({ pathname: "/(tabs)/lists/edit-list", params: { listId: list.id } })}
             onShare={() => router.push({ pathname: "/(tabs)/lists/share", params: { listId: list.id } })}
           />
         )}
@@ -78,7 +78,7 @@ export default function ListsScreen() {
           key={selected.list.id}
           {...selected}
           onDismiss={() => setSelected(null)}
-          onEdit={() => { const id = selected.list.id; setSelected(null); router.push({ pathname: "/(tabs)/lists/edit", params: { listId: id } }); }}
+          onEdit={() => { const id = selected.list.id; setSelected(null); router.push({ pathname: "/(tabs)/lists/edit-list", params: { listId: id } }); }}
           onShare={() => { const id = selected.list.id; setSelected(null); router.push({ pathname: "/(tabs)/lists/share", params: { listId: id } }); }}
         />
       )}

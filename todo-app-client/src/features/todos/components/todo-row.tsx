@@ -33,7 +33,7 @@ export function TodoRow({ todo }: { todo: Todo }) {
     await invalidateList(queryClient, todo.listId);
   } });
   const busy = completion.isPending || remove.isPending;
-  const edit = () => { if (!busy) router.push({ pathname: "/edit-todo", params: { todoId: todo.id } }); };
+  const edit = () => { if (!busy) router.push({ pathname: "/lists/edit-todo", params: { todoId: todo.id } }); };
   const supporting = [
     todo.description,
     todo.deadline ? `Due ${new Date(todo.deadline).toLocaleString()}` : null,

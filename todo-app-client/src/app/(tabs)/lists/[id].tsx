@@ -51,8 +51,8 @@ export default function ListScreen() {
             owner={list.role === "owner"}
             hasDescription={Boolean(list.description)}
             onShare={() => router.push({ pathname: "/(tabs)/lists/share", params: { listId: id } })}
-            onRename={() => router.push({ pathname: "/(tabs)/lists/edit", params: { listId: id } })}
-            onDescription={() => router.push({ pathname: "/(tabs)/lists/edit", params: { listId: id, field: "description" } })}
+            onRename={() => router.push({ pathname: "/lists/edit-list", params: { listId: id } })}
+            onDescription={() => router.push({ pathname: "/(tabs)/lists/edit-list", params: { listId: id, field: "description" } })}
             onDelete={() => setDeleting(true)}
           /> : undefined,
           headerLargeTitleEnabled: true
