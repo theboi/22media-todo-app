@@ -31,14 +31,12 @@ export function TodoRow({ todo }: { todo: Todo }) {
   const supporting = [
     todo.description,
     todo.deadline ? `Due ${new Date(todo.deadline).toLocaleString()}` : null,
-    todo.isDone ? "Completed" : "Incomplete",
-    completion.isPending ? "Saving…" : null,
     completion.error?.message,
   ].filter(Boolean).join(" · ");
   return (
     <ListItem
       onPress={toggle}
-      supportingText={<Text textStyle={{ fontSize: 13, color: "#8E8E93" }}>{supporting}</Text>}
+      supportingText={supporting !== "" ? <Text textStyle={{ fontSize: 13, color: "#8E8E93" }}>{supporting}</Text> : null}
       trailing={
         <Pressable
           accessibilityRole="checkbox"
@@ -47,12 +45,12 @@ export function TodoRow({ todo }: { todo: Todo }) {
           accessibilityLabel={todo.name}
           accessibilityState={{ checked: todo.isDone, disabled: completion.isPending }}
           accessibilityHint={todo.isDone ? "Mark incomplete" : "Mark complete"}
-          disabled={completion.isPending}
+          // disabled={completion.isPending}
           onPress={(event) => {
             event.stopPropagation();
             toggle();
           }}
-          style={{ width: 44, height: 44, alignItems: "center", justifyContent: "center", opacity: completion.isPending ? 0.4 : 1 }}
+          style={{ width: 44, height: 22, alignItems: "center", justifyContent: "center", opacity: completion.isPending ? 0.4 : 1 }}
         >
           <SymbolView
             name={{
@@ -60,7 +58,7 @@ export function TodoRow({ todo }: { todo: Todo }) {
               android: todo.isDone ? "check_circle" : "radio_button_unchecked",
               web: todo.isDone ? "check_circle" : "radio_button_unchecked",
             }}
-            tintColor={todo.isDone ? "#8E8E93" : colors.primary}
+            tintColor={colors.primary}
             size={26}
             accessible={false}
           />

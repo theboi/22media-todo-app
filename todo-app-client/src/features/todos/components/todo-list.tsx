@@ -11,7 +11,11 @@ export type TodoListSection = {
   onOpen?(): void;
 };
 
-export function TodoList({ sections, header, onRefresh }: {
+export function TodoList({
+  sections,
+  header,
+  onRefresh,
+}: {
   sections: TodoListSection[];
   header?: ReactNode;
   onRefresh(): Promise<void>;
@@ -20,14 +24,30 @@ export function TodoList({ sections, header, onRefresh }: {
     <Host style={{ flex: 1 }}>
       <List onRefresh={onRefresh}>
         {header}
-        {sections.map(section => (
-          <FieldGroup.Section key={section.id} title={section.onOpen ? undefined : section.title}>
+        {sections.map((section) => (
+          <FieldGroup.Section
+            key={section.id}
+            title={section.onOpen ? undefined : section.title}
+          >
             {section.onOpen && (
               <FieldGroup.SectionHeader>
-                <ListItem onPress={section.onOpen}><Text textStyle={{ fontWeight: "bold" }}>{section.title ?? "List"}</Text></ListItem>
+                <ListItem onPress={section.onOpen}>
+                  <Text textStyle={{ fontWeight: "bold" }}>
+                    {section.title ?? "List"}
+                  </Text>
+                </ListItem>
               </FieldGroup.SectionHeader>
             )}
-            {section.todos.length ? section.todos.map(todo => <TodoRow key={todo.id} todo={todo} />) : <Text textStyle={{ color: "#8E8E93" }}>{section.emptyText}</Text>}
+            {section.todos.length ? (
+              section.todos.map((todo) => <TodoRow key={todo.id} todo={todo} />)
+            ) : (
+              <Text textStyle={{ color: "#8E8E93" }}>{section.emptyText}</Text>
+            )}
+            <FieldGroup.SectionFooter>
+              {section && (
+                <Text>{`${section.todos.filter((todo) => !todo.isDone).length}/${section.todos.length} outstanding`}</Text>
+              )}
+            </FieldGroup.SectionFooter>
           </FieldGroup.Section>
         ))}
       </List>

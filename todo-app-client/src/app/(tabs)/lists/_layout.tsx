@@ -13,7 +13,7 @@ export default function ListsLayout() {
       />
       <Stack.Screen
         name="[id]"
-        options={{ title: "List", headerBackTitle: "Lists" }}
+        options={{ title: "List", headerBackTitle: "Lists", headerLargeTitleEnabled: true }}
       />
       <Stack.Screen
         name="add-new"
