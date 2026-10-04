@@ -43,7 +43,7 @@ export default function ListScreen() {
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <Stack.Screen
         options={{
-          title: list?.name ?? "List",
+          title: list?.name ?? "",
           headerTintColor: list ? "#FFFFFF" : undefined,
           headerShadowVisible: false,
           headerBackground: list ? () => <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: list.color, experimental_backgroundImage: listGradient(list.color) }} /> : undefined,
@@ -55,6 +55,7 @@ export default function ListScreen() {
             onDescription={() => router.push({ pathname: "/(tabs)/lists/edit", params: { listId: id, field: "description" } })}
             onDelete={() => setDeleting(true)}
           /> : undefined,
+          headerLargeTitleEnabled: true
         }}
       />
       <TodoList
