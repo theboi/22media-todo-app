@@ -1,18 +1,14 @@
-import { TodoName } from "./todo-name";
-import { ListItem, RNHostView, Text } from "@expo/ui";
+import { TodoRowContent } from "./todo-row-content";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { useRef } from "react";
-import { SymbolView } from "expo-symbols";
-import { Platform, Pressable } from "react-native";
-import { useTheme, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { SwipeDelete } from "@/components/ui/swipe-delete";
 import { invalidateList } from "@/lib/api/invalidate-list";
 import { setTodoDone, deleteTodo } from "@/lib/api/todos";
 import type { Todo } from "@/lib/api/list-detail";
 
 export function TodoRow({ todo }: { todo: Todo }) {
-  const { colors } = useTheme();
   const router = useRouter();
   const queryClient = useQueryClient();
   const inFlight = useRef(false);
@@ -44,43 +40,10 @@ export function TodoRow({ todo }: { todo: Todo }) {
     completion.error?.message,
     remove.error?.message,
   ].filter(Boolean).join(" · ");
-  const checkbox = (
-        <Pressable
-          accessibilityRole="checkbox"
-          aria-checked={todo.isDone}
-          aria-disabled={busy}
-          accessibilityLabel={todo.name}
-          accessibilityState={{ checked: todo.isDone, disabled: busy }}
-          accessibilityHint={todo.isDone ? "Mark incomplete" : "Mark complete"}
-          disabled={busy}
-          onPress={(event) => {
-            event.stopPropagation();
-            toggle();
-          }}
-          style={{ width: 44, height: 44, alignItems: "center", justifyContent: "center", opacity: busy ? 0.4 : 1 }}
-        >
-          <SymbolView
-            name={{
-              ios: todo.isDone ? "checkmark.circle.fill" : "circle",
-              android: todo.isDone ? "check_circle" : "radio_button_unchecked",
-              web: todo.isDone ? "check_circle" : "radio_button_unchecked",
-            }}
-            tintColor={colors.primary}
-            size={26}
-            accessible={false}
-          />
-        </Pressable>
-  );
+
   return (
     <SwipeDelete disabled={busy} onDelete={() => { if (inFlight.current) return; inFlight.current = true; remove.mutate({ id: todo.id, key: randomUUID() }); }}>
-    <ListItem
-      supportingText={supporting !== "" ? <Text textStyle={{ fontSize: 13, color: "#8E8E93" }}>{supporting}</Text> : null}
-      trailing={
-        Platform.OS === "android" ? <RNHostView matchContents>{checkbox}</RNHostView> : checkbox
-      }
-    >
-      <TodoName todo={todo} disabled={busy} onDescription={edit} />
-    </ListItem>
+    <TodoRowContent todo={todo} supporting={supporting} disabled={busy} onToggle={toggle} onDescription={edit} />
     </SwipeDelete>
   );
 }
