@@ -1,3 +1,4 @@
+import { TodoName } from "./todo-name";
 import { ListItem, RNHostView, Text } from "@expo/ui";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
@@ -73,12 +74,12 @@ export function TodoRow({ todo }: { todo: Todo }) {
   return (
     <SwipeDelete disabled={busy} onDelete={() => { if (inFlight.current) return; inFlight.current = true; remove.mutate({ id: todo.id, key: randomUUID() }); }}>
     <ListItem
-      supportingText={supporting !== "" ? <Text onPress={edit} textStyle={{ fontSize: 13, color: "#8E8E93" }}>{supporting}</Text> : null}
+      supportingText={supporting !== "" ? <Text textStyle={{ fontSize: 13, color: "#8E8E93" }}>{supporting}</Text> : null}
       trailing={
         Platform.OS === "android" ? <RNHostView matchContents>{checkbox}</RNHostView> : checkbox
       }
     >
-      <Text onPress={edit} textStyle={todo.isDone ? { color: "#8E8E93" } : undefined}>{todo.name}</Text>
+      <TodoName todo={todo} disabled={busy} onDescription={edit} />
     </ListItem>
     </SwipeDelete>
   );
