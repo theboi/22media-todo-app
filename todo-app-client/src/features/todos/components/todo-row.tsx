@@ -4,12 +4,15 @@ import { randomUUID } from "expo-crypto";
 import { useRef } from "react";
 import { SymbolView } from "expo-symbols";
 import { Pressable } from "react-native";
-import { useTheme } from "expo-router";
-import { setTodoDone } from "@/lib/api/todos";
+import { useTheme, useRouter } from "expo-router";
+import { SwipeDelete } from "@/components/ui/swipe-delete";
+import { invalidateList } from "@/lib/api/invalidate-list";
+import { setTodoDone, deleteTodo } from "@/lib/api/todos";
 import type { Todo } from "@/lib/api/list-detail";
 
 export function TodoRow({ todo }: { todo: Todo }) {
   const { colors } = useTheme();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const inFlight = useRef(false);
   const completion = useMutation({
@@ -28,29 +31,36 @@ export function TodoRow({ todo }: { todo: Todo }) {
     inFlight.current = true;
     completion.mutate({ id: todo.id, isDone: !todo.isDone, key: randomUUID() });
   };
+  const remove = useMutation({ mutationFn: deleteTodo, networkMode: "always", onSettled: () => { inFlight.current = false; }, onSuccess: async () => {
+    queryClient.removeQueries({ queryKey: ["todo", todo.id] });
+    await invalidateList(queryClient, todo.listId);
+  } });
+  const busy = completion.isPending || remove.isPending;
+  const edit = () => { if (!busy) router.push({ pathname: "/edit-todo", params: { todoId: todo.id } }); };
   const supporting = [
     todo.description,
     todo.deadline ? `Due ${new Date(todo.deadline).toLocaleString()}` : null,
     completion.error?.message,
+    remove.error?.message,
   ].filter(Boolean).join(" · ");
   return (
+    <SwipeDelete disabled={busy} onDelete={() => { if (inFlight.current) return; inFlight.current = true; remove.mutate({ id: todo.id, key: randomUUID() }); }}>
     <ListItem
-      onPress={toggle}
-      supportingText={supporting !== "" ? <Text textStyle={{ fontSize: 13, color: "#8E8E93" }}>{supporting}</Text> : null}
+      supportingText={supporting !== "" ? <Text onPress={edit} textStyle={{ fontSize: 13, color: "#8E8E93" }}>{supporting}</Text> : null}
       trailing={
         <Pressable
           accessibilityRole="checkbox"
           aria-checked={todo.isDone}
-          aria-disabled={completion.isPending}
+          aria-disabled={busy}
           accessibilityLabel={todo.name}
-          accessibilityState={{ checked: todo.isDone, disabled: completion.isPending }}
+          accessibilityState={{ checked: todo.isDone, disabled: busy }}
           accessibilityHint={todo.isDone ? "Mark incomplete" : "Mark complete"}
-          // disabled={completion.isPending}
+          disabled={busy}
           onPress={(event) => {
             event.stopPropagation();
             toggle();
           }}
-          style={{ width: 44, height: 22, alignItems: "center", justifyContent: "center", opacity: completion.isPending ? 0.4 : 1 }}
+          style={{ width: 44, height: 44, alignItems: "center", justifyContent: "center", opacity: busy ? 0.4 : 1 }}
         >
           <SymbolView
             name={{
@@ -65,7 +75,8 @@ export function TodoRow({ todo }: { todo: Todo }) {
         </Pressable>
       }
     >
-      <Text textStyle={todo.isDone ? { color: "#8E8E93" } : undefined}>{todo.name}</Text>
+      <Text onPress={edit} textStyle={todo.isDone ? { color: "#8E8E93" } : undefined}>{todo.name}</Text>
     </ListItem>
+    </SwipeDelete>
   );
 }

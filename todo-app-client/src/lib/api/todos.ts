@@ -42,3 +42,7 @@ export const savePinnedLists = async (input: { ids: string[]; key: string }) =>
       { method: "PATCH", key: input.key },
     ),
   );
+
+export const fetchTodo = async (id: string, signal: AbortSignal) => readTodo(await apiRequest(`/todos/${encodeURIComponent(id)}`, signal));
+export const updateTodoDescription = async ({ id, description, key }: { id: string; description: string | null; key: string }) => readTodo(await apiRequest(`/todos/${encodeURIComponent(id)}`, undefined, { description }, { method: "PATCH", key }));
+export const deleteTodo = async ({ id, key }: { id: string; key: string }) => { await apiRequest(`/todos/${encodeURIComponent(id)}`, undefined, undefined, { method: "DELETE", key }); };

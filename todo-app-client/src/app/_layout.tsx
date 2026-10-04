@@ -1,3 +1,4 @@
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { DarkTheme, DefaultTheme, ThemeProvider } from "expo-router";
@@ -13,6 +14,7 @@ export default function RootLayout() {
   const [queryClient] = useState(() => new QueryClient());
 
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <QueryClientProvider client={queryClient}>
         <Stack>
@@ -21,8 +23,10 @@ export default function RootLayout() {
             name="(tabs)"
             options={{ headerShown: false }}
           />
+          <Stack.Screen name="edit-todo" options={{ title: "Edit Todo", presentation: "formSheet", sheetAllowedDetents: [0.5, 1], sheetGrabberVisible: true }} />
         </Stack>
       </QueryClientProvider>
     </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
