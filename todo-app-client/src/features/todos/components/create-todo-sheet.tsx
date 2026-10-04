@@ -1,10 +1,10 @@
-import { BottomSheet, FieldGroup, TextInput } from "@expo/ui";
+import { TextInput } from "@expo/ui";
+import { FormField } from "@/components/ui/form-field";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { useRef, useState } from "react";
 import { createTodo } from "@/lib/api/todos";
 import { SheetForm } from "@/components/ui/sheet-form";
-import { sheetDismissModifiers } from "@/components/ui/sheet-modifiers";
 export function CreateTodoSheet({
   listId,
   onDismiss,
@@ -38,36 +38,24 @@ export function CreateTodoSheet({
     create.mutate(attempt.current);
   };
   return (
-    <BottomSheet
-      isPresented
-      onDismiss={() => {
-        if (!create.isPending) onDismiss();
-      }}
-      modifiers={sheetDismissModifiers(create.isPending)}
-      shouldDismissOnBackPress={!create.isPending}
-      shouldDismissOnClickOutside={!create.isPending}
-      snapPoints={["full"]}
+    <SheetForm
+      error={create.error?.message}
+      submitLabel={create.isPending ? "Adding…" : "Add Todo"}
+      disabled={!name.trim() || create.isPending}
+      pending={create.isPending}
+      onSubmit={submit}
     >
-      <SheetForm
-        title="New Todo"
-        error={create.error?.message}
-        submitLabel={create.isPending ? "Adding…" : "Add Todo"}
-        disabled={!name.trim() || create.isPending}
-        pending={create.isPending}
-        onSubmit={submit}
-        onCancel={onDismiss}
-      >
-        <FieldGroup.Section title="Todo name">
-          <TextInput
-            placeholder="What needs doing?"
-            onChangeText={setName}
-            maxLength={200}
-            editable={!create.isPending}
-            returnKeyType="done"
-            onSubmitEditing={submit}
-          />
-        </FieldGroup.Section>
-      </SheetForm>
-    </BottomSheet>
+      <FormField label="Name">
+        <TextInput
+          textAlign="right"
+          placeholder="What needs doing?"
+          onChangeText={setName}
+          maxLength={200}
+          editable={!create.isPending}
+          returnKeyType="done"
+          onSubmitEditing={submit}
+        />
+      </FormField>
+    </SheetForm>
   );
 }
