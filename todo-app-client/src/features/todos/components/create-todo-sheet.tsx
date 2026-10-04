@@ -1,3 +1,4 @@
+import { DeadlineField } from "@/components/ui/deadline-field";
 import { TextInput } from "@expo/ui";
 import { FormField } from "@/components/ui/form-field";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -13,6 +14,7 @@ export function CreateTodoSheet({
   onDismiss(): void;
 }) {
   const [name, setName] = useState("");
+  const [deadline, setDeadline] = useState<Date | null>(null);
   const attempt = useRef<Parameters<typeof createTodo>[0] | null>(null);
   const queryClient = useQueryClient();
   const create = useMutation({
@@ -28,12 +30,13 @@ export function CreateTodoSheet({
   });
   const submit = () => {
     if (!name.trim() || create.isPending) return;
-    if (!attempt.current || attempt.current.name !== name.trim())
+    if (!attempt.current || attempt.current.name !== name.trim() || attempt.current.deadline !== (deadline?.toISOString() ?? null))
       attempt.current = {
         id: randomUUID(),
         key: randomUUID(),
         listId,
         name: name.trim(),
+        deadline: deadline?.toISOString() ?? null,
       };
     create.mutate(attempt.current);
   };
@@ -44,6 +47,7 @@ export function CreateTodoSheet({
       disabled={!name.trim() || create.isPending}
       pending={create.isPending}
       onSubmit={submit}
+      fieldCount={deadline ? 3 : 2}
     >
       <FormField label="Name">
         <TextInput
@@ -56,6 +60,7 @@ export function CreateTodoSheet({
           onSubmitEditing={submit}
         />
       </FormField>
+      <DeadlineField value={deadline} onChange={setDeadline} disabled={create.isPending} />
     </SheetForm>
   );
 }

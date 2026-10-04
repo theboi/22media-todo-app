@@ -7,13 +7,14 @@ export const createTodo = async (input: {
   id: string;
   listId: string;
   name: string;
+  deadline?: string | null;
   key: string;
 }) =>
   readTodo(
     await apiRequest(
       "/todos",
       undefined,
-      { id: input.id, todo_list_id: input.listId, name: input.name, is_done: false },
+      { id: input.id, todo_list_id: input.listId, name: input.name, deadline: input.deadline ?? null, is_done: false },
       { method: "POST", key: input.key },
     ),
   );
