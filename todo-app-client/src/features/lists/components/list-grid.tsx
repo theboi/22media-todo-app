@@ -16,6 +16,7 @@ export function ListGrid({ lists, renderCard, header, empty, refreshing, onRefre
   const width = Math.min(availableWidth, 720);
   const columns = width < 360 || dimensions.fontScale > 1.4 ? 1 : 2;
   const cardWidth = Math.max(1, (width - 40 - 12 * (columns - 1)) / columns);
+  
   return (
     <View
       style={{ flex: 1, width: "100%", maxWidth: 720, alignSelf: "center" }}

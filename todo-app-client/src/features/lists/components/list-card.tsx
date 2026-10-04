@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { SymbolView } from "expo-symbols";
 import { Link } from "expo-router";
+import Color from "color";
 import { Platform, Pressable, Text, View } from "react-native";
 import { ListIcon } from "./list-icon";
 import type { TodoList } from "@/lib/api/lists";
@@ -22,8 +23,6 @@ export function ListCard({
     const c = parseInt(hex, 16) / 255;
     return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
   });
-  const textColor =
-    0.2126 * r + 0.7152 * g + 0.0722 * b > 0.179 ? "#111827" : "#FFFFFF";
   const content = (
     <Pressable
       accessibilityRole={onSelect ? "checkbox" : "button"}
@@ -42,35 +41,38 @@ export function ListCard({
         gap: 22,
         borderRadius: 20,
         borderCurve: "continuous",
-        backgroundColor: list.color,
+        experimental_backgroundImage: `radial-gradient(circle at center top, ${Color(list.color).lighten(0.2)} 0%, ${list.color} 100%)`,
         opacity: disabled ? 0.5 : 1,
         transform: [{ scale: pressed ? 0.98 : 1 }],
       }}
     >
       {selected && (
         <View style={{ position: "absolute", top: 16, right: 16 }}>
-          <SymbolView name={{ ios: "checkmark.circle.fill", android: "check_circle", web: "check_circle" }} tintColor="#FFFFFF" size={26} accessible={false} />
+          <SymbolView name={{ ios: "checkmark.circle.fill", android: "check_circle", web: "check_circle" }} tintColor="#FFF" size={26} accessible={false} />
         </View>
       )}
-      <ListIcon name={list.icon} color="#FFFFFF" size={32} />
-      <View style={{ gap: 6 }}>
-        <Text style={{ color: textColor, fontSize: 19, fontWeight: "700" }}>
+      
+      <View style={{ gap: 6, flex: 1, justifyContent: "flex-end" }}>
+        <ListIcon name={list.icon} color="#FFF" size={32} />
+        <Text style={{ color: "#FFF", fontSize: 23, fontWeight: "700" }}>
           {list.name}
         </Text>
-        <Text style={{ color: textColor, fontSize: 13 }}>
-          {list.role === "owner" ? "Your list" : "Shared with you"}
-        </Text>
+        {list.role !== "owner" && <Text style={{ color: "#FFF", fontSize: 13 }}>
+          Shared with you
+        </Text>}
       </View>
     </Pressable>
   );
   if (onSelect) return content;
   const href = { pathname: "/lists/[id]", params: { id: list.id } } as const;
+
   if (Platform.OS !== "ios")
     return (
       <Link href={href} asChild>
         {content}
       </Link>
     );
+  
   return (
     <Link href={href} asChild>
       <Link.Trigger>{content}</Link.Trigger>
