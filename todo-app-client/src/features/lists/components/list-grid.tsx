@@ -1,5 +1,3 @@
-import type * as React from "react";
-import { useState } from "react";
 import {
   FlatList,
   View,
@@ -29,8 +27,7 @@ export function ListGrid({
   style?: StyleProp<ViewStyle>;
 }) {
   const dimensions = useWindowDimensions();
-  const [availableWidth, setAvailableWidth] = useState(dimensions.width);
-  const width = Math.min(availableWidth, 720);
+  const width = Math.min(dimensions.width, 720);
   const columns = width < 360 || dimensions.fontScale > 1.4 ? 1 : 2;
   const cardWidth = Math.max(1, (width - 40 - 12 * (columns - 1)) / columns);
 
@@ -38,10 +35,6 @@ export function ListGrid({
     <FlatList
       key={columns}
       style={[{ flex: 1 }, style]}
-      onLayout={({ nativeEvent }) => {
-        if (nativeEvent.layout.width > 0)
-          setAvailableWidth(nativeEvent.layout.width);
-      }}
       data={lists}
       numColumns={columns}
       keyExtractor={(list) => list.id}
