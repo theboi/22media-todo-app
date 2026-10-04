@@ -35,7 +35,7 @@ export function TodoName({ todo, disabled, onDescription }: { todo: Todo; disabl
   return <RNHostView matchContents><View style={{ width: Math.max(120, Math.min(width, 720) - 112) }}>
     {editing ? <TextInput accessibilityLabel="Todo name" defaultValue={draft} autoFocus maxLength={200} returnKeyType="done" editable={!save.isPending && !disabled} onChangeText={value => { setDraft(value); setValidation(undefined); }} onSubmitEditing={submit} onBlur={submit} style={{ fontSize: 17, color: colors.text, paddingVertical: 8 }} /> :
       <ActionMenu longPress label={`${todo.name}. Tap to rename; long press for description`} actions={[{ id: "description", title: todo.description ? "Edit Description" : "Add Description", icon: { ios: "text.alignleft", android: "notes", web: "notes" }, disabled: disabled || save.isPending }]} onAction={onDescription} onPress={() => { if (disabled) return; setDraft(todo.name); setValidation(undefined); save.reset(); setEditing(true); }}>
-        <Text style={{ fontSize: 17, paddingVertical: 6, color: todo.isDone ? "#8E8E93" : colors.text }}>{todo.name}</Text>
+        <Text style={{ fontSize: 17, textAlign: "left", paddingVertical: 6, color: todo.isDone ? "#8E8E93" : colors.text }}>{todo.name}</Text>
       </ActionMenu>}
     {validation || save.error ? <Text accessibilityRole="alert" style={{ color: colors.notification }}>{validation ?? save.error?.message}</Text> : null}
   </View></RNHostView>;
