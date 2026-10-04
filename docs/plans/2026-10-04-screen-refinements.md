@@ -69,3 +69,15 @@
 - Browser reproduction: title taps did nothing before the toggle fix. Afterward, row and checkbox each changed the database revision once; a completed demo task was reopened and restored.
 - Seeded Reading (Book icon, Mint color) and Read one chapter through the app to verify forms end to end. Reading was appended after the existing Weekend pin, and the picker then showed all lists already pinned. The new todo persisted with is_done=false, completed_at=null, version=1.
 - Final checks: 23 client tests, typecheck, lint, and fresh iOS/Android exports passed. A targeted reviewer found no further Important/Critical issues. Physical-device gestures and large-title rendering remain unverified.
+
+## Native forms and management follow-up
+
+Implemented sequentially by section:
+
+- `b40a19e`: FieldGroup inner scrolling disabled; outer forms handle overflow. Create Todo has an optional date/time deadline.
+- `3e29497`: List rename/description forms, email invitations and revocation, pending invite acceptance/decline with email verification, native delete confirmation, and shared card/header gradient.
+- `555fe85`: Todo text edits description, checkbox controls completion, and native swipe exposes Delete.
+- `3f31100`: Pin Lists is a Stack formSheet, shows existing selections, supports unchecking/clearing all, and uses shared full-width buttons. This supersedes the earlier picker that excluded existing pins.
+- `f19c65f`: Matching Sign In/Sign Up Stack forms, left labels/right fields, removed explanatory copy and link underline.
+
+Final review repairs navigation callbacks after sheet dismissal, Android checkbox hosting, the iOS alert anchor, and fresh share retry keys after successful invitations. Browser verification found a native-only SwiftUI modifier import in the shared button; platform-specific modifier helpers remove that web runtime failure. Native glass styling and swipe gestures still need physical-device verification.
