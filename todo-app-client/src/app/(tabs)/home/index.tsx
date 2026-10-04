@@ -7,7 +7,10 @@ import { View } from "react-native";
 import { fetchLists } from "@/lib/api/todo-lists";
 import { fetchTodos, fetchPinnedLists } from "@/lib/api/todos";
 import { outstandingTodos } from "@/lib/api/home-data";
-import { TodoList, type TodoListSection } from "@/features/todos/components/todo-list";
+import {
+  TodoList,
+  type TodoListSection,
+} from "@/features/todos/components/todo-list";
 import { useSurfaceColors } from "@/hooks/use-surface-colors";
 
 export default function HomeScreen() {
@@ -48,28 +51,47 @@ export default function HomeScreen() {
     ...(pins.data ?? []).flatMap((id) => {
       const list = lists.data?.find((item) => item.id === id);
       if (!list) return [];
-      return [{
-        id,
-        title: list.name,
-        todos: outstanding.filter((todo) => todo.listId === id),
-        emptyText: "All caught up in this list.",
-        onOpen: () => router.push({ pathname: "/lists/[id]", params: { id } }),
-      }];
+      return [
+        {
+          id,
+          title: list.name,
+          todos: outstanding.filter((todo) => todo.listId === id),
+          emptyText: "All caught up in this list.",
+          onOpen: () =>
+            router.push({ pathname: "/lists/[id]", params: { id } }),
+        },
+      ];
     }),
   ];
   let status: string | undefined;
   if (error) status = `${error.message} Tap to retry.`;
-  else if (loading) status = paused ? "You’re offline. Reconnect to load Home." : "Loading Home…";
+  else if (loading)
+    status = paused
+      ? "You’re offline. Reconnect to load Home."
+      : "Loading Home…";
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <Stack.Screen options={{ headerRight: () => <PinButton disabled={!lists.data || !pins.data} onPress={() => router.push("/pin-lists")} /> }} />
+      <Stack.Screen
+        options={{
+          headerRight: () => (
+            <PinButton
+              disabled={!lists.data || !pins.data}
+              
+              onPress={() => router.push("/home/pin-lists")}
+            />
+          ),
+        }}
+      />
       <TodoList
         sections={todos.data ? sections : []}
         onRefresh={refresh}
         header={
           <>
-
-            {status && <ListItem onPress={error ? () => void refresh() : undefined}><Text>{status}</Text></ListItem>}
+            {status && (
+              <ListItem onPress={error ? () => void refresh() : undefined}>
+                <Text>{status}</Text>
+              </ListItem>
+            )}
           </>
         }
       />

@@ -24,9 +24,6 @@ export default function RootLayout() {
             options={{ headerShown: false }}
           />
           <Stack.Screen name="edit-todo" options={{ title: "Edit Todo", presentation: "formSheet", sheetAllowedDetents: [0.5, 1], sheetGrabberVisible: true }} />
-          <Stack.Screen name="pin-lists" options={{ title: "Pin Lists", presentation: "formSheet", sheetAllowedDetents: [0.5, 1], sheetGrabberVisible: true }} />
-          <Stack.Screen name="sign-in" options={{ title: "Sign In", presentation: "formSheet", sheetAllowedDetents: [0.5, 1], sheetGrabberVisible: true }} />
-          <Stack.Screen name="sign-up" options={{ title: "Sign Up", presentation: "formSheet", sheetAllowedDetents: [0.5, 1], sheetGrabberVisible: true }} />
         </Stack>
       </QueryClientProvider>
     </ThemeProvider>
