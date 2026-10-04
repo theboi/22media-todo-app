@@ -7,5 +7,8 @@ export async function recoverAccountQueries(queryClient: QueryClient) {
     queryClient.invalidateQueries({ queryKey: ["auth", "session"] }),
     queryClient.invalidateQueries({ queryKey: ["todos"] }),
     queryClient.invalidateQueries({ queryKey: ["pinned-lists"] }),
+    queryClient.invalidateQueries({ queryKey: ["todo"] }),
+    queryClient.invalidateQueries({ queryKey: ["pending-shares"] }),
+    queryClient.invalidateQueries({ queryKey: ["list-shares"] }),
   ]);
 }

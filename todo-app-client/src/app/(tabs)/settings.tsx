@@ -1,13 +1,12 @@
 import { FieldGroup, Host, List, ListItem, Text } from "@expo/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
 import { View } from "react-native";
-import { SignInSheet } from "@/features/auth/components/sign-in-sheet";
+import { useRouter } from "expo-router";
 import { auth } from "@/lib/auth/session";
 import { useSurfaceColors } from "@/hooks/use-surface-colors";
 
 export default function SettingsScreen() {
-  const [isPresented, setIsPresented] = useState(false);
+  const router = useRouter();
   const colors = useSurfaceColors();
   const queryClient = useQueryClient();
   const { data: session, error, refetch } = useQuery({
@@ -29,6 +28,9 @@ export default function SettingsScreen() {
         queryClient.resetQueries({ queryKey: ["todo-lists"] }),
         queryClient.resetQueries({ queryKey: ["todos"] }),
         queryClient.resetQueries({ queryKey: ["pinned-lists"] }),
+        queryClient.resetQueries({ queryKey: ["todo"] }),
+        queryClient.resetQueries({ queryKey: ["pending-shares"] }),
+        queryClient.resetQueries({ queryKey: ["list-shares"] }),
       ]);
     },
   });
@@ -53,7 +55,7 @@ export default function SettingsScreen() {
                   <Text>{logout.isPending ? "Signing out…" : "Sign Out"}</Text>
                 </ListItem>
               ) : (
-                <ListItem onPress={logout.isPending ? undefined : () => setIsPresented(true)}>
+                <ListItem onPress={logout.isPending ? undefined : () => router.push("/sign-in")}>
                   <Text>Sign In</Text>
                 </ListItem>
               )}
@@ -62,7 +64,6 @@ export default function SettingsScreen() {
           {logout.error && <ListItem><Text>{logout.error.message}</Text></ListItem>}
         </List>
       </Host>
-      <SignInSheet isPresented={isPresented} onDismiss={() => setIsPresented(false)} />
     </View>
   );
 }
