@@ -36,7 +36,6 @@ export default function AddNewListScreen() {
         queryClient.invalidateQueries({ queryKey: ["todo-lists"] }),
         queryClient.invalidateQueries({ queryKey: ["pinned-lists"] }),
       ]);
-      router.dismiss();
     },
   });
   const submit = () => {
@@ -56,7 +55,7 @@ export default function AddNewListScreen() {
         icon,
         description: description.trim() || null,
       };
-    create.mutate(attempt.current);
+    create.mutate(attempt.current, { onSuccess: () => router.dismiss() });
   };
 
   return (
