@@ -20,13 +20,16 @@ export default function ListsLayout() {
         options={{
           title: "Add New",
           presentation: "formSheet",
-          sheetAllowedDetents: [0.5],
+          sheetAllowedDetents: [0.5, 1],
         }}
       />
       <Stack.Screen
         name="add-todo"
-        options={{ title: "New Todo", presentation: "formSheet", sheetAllowedDetents: [0.5], sheetGrabberVisible: true }}
+        options={{ title: "New Todo", presentation: "formSheet", sheetAllowedDetents: [0.5, 1], sheetGrabberVisible: true }}
       />
+      <Stack.Screen name="edit" options={{ title: "Edit List", presentation: "formSheet", sheetAllowedDetents: [0.5, 1] }} />
+      <Stack.Screen name="share" options={{ title: "Share List", presentation: "formSheet", sheetAllowedDetents: [0.5, 1] }} />
+      <Stack.Screen name="verify-email" options={{ title: "Verify Email", presentation: "formSheet", sheetAllowedDetents: [0.5, 1] }} />
     </Stack>
   );
 }

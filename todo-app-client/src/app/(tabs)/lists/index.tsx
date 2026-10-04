@@ -1,6 +1,7 @@
+import { PendingShares } from "@/features/lists/components/pending-shares";
 import { useQuery } from "@tanstack/react-query";
 import { Stack } from "expo-router/stack";
-import { PlusButton } from "@/components/plus-button";
+import { PlusButton } from "@/components/ui/plus-button";
 import { useRouter, useTheme } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 import { ListGrid } from "@/features/lists/components/list-grid";
@@ -43,15 +44,15 @@ export default function ListsScreen() {
             list={list}
             onActions={() => setSelected({ list, confirm: false })}
             onDelete={() => setSelected({ list, confirm: true })}
+            onRename={() => router.push({ pathname: "/(tabs)/lists/edit", params: { listId: list.id } })}
+            onShare={() => router.push({ pathname: "/(tabs)/lists/share", params: { listId: list.id } })}
           />
         )}
         header={
-          query.error ? (
-            <ListsErrorState
-              message={query.error.message}
-              onRetry={() => void query.refetch()}
-            />
-          ) : null
+          <>
+            <PendingShares onVerify={() => router.push("/(tabs)/lists/verify-email")} />
+            {query.error ? <ListsErrorState message={query.error.message} onRetry={() => void query.refetch()} /> : null}
+          </>
         }
         empty={
           paused ? (
@@ -77,6 +78,8 @@ export default function ListsScreen() {
           key={selected.list.id}
           {...selected}
           onDismiss={() => setSelected(null)}
+          onEdit={() => { const id = selected.list.id; setSelected(null); router.push({ pathname: "/(tabs)/lists/edit", params: { listId: id } }); }}
+          onShare={() => { const id = selected.list.id; setSelected(null); router.push({ pathname: "/(tabs)/lists/share", params: { listId: id } }); }}
         />
       )}
     </View>

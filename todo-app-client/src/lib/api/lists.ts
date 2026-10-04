@@ -13,6 +13,9 @@ const record = (value: unknown): Record<string, unknown> => {
     throw new Error("The server returned an invalid response.");
   return value;
 };
+export class ApiRequestError extends Error {
+  constructor(public code: string, message: string) { super(message); }
+}
 export const request = async (
   url: string,
   path: string,
@@ -41,16 +44,20 @@ export const request = async (
   if (response.status === 204) return undefined;
   const payload: unknown = await response.json();
   const data = record(payload);
-  if (!response.ok)
-    throw new Error(
-      response.status === 401
-        ? "Your session is no longer valid."
-        : response.status === 404
-          ? "This list was deleted or is no longer available."
-          : operation
-            ? "Could not save your change. Please try again."
-            : "Could not load your lists. Please try again.",
-    );
+  if (!response.ok) {
+    const error = isRecord(data.error) ? data.error : {};
+    const code = typeof error.code === "string" ? error.code : "REQUEST_FAILED";
+    const messages: Record<string, string> = {
+      EMAIL_NOT_VERIFIED: "Verify your email before accepting an invitation.",
+      REGISTERED_ACCOUNT_REQUIRED: "Sign in to share lists.",
+      FORBIDDEN: "Only the list owner can make this change.",
+      INVALID_VERIFICATION_CODE: "That verification code is invalid or expired.",
+      RATE_LIMITED: "Too many attempts. Please try again later.",
+    };
+    const fields = isRecord(error.fields) ? Object.values(error.fields).flat().filter((value): value is string => typeof value === "string") : [];
+    const fallback = response.status === 401 ? "Your session is no longer valid." : response.status === 404 ? "This item was deleted or is no longer available." : operation ? "Could not save your change. Please try again." : "Could not load your data. Please try again.";
+    throw new ApiRequestError(code, messages[code] ?? (fields.length ? fields.join(" ") : fallback));
+  }
   return data.data;
 };
 export const readLists = (value: unknown): TodoList[] => {

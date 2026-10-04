@@ -23,6 +23,7 @@ export default function AddNewListScreen() {
   const router = useRouter();
 
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [icon, setIcon] = useState("droplet");
   const [color, setColor] = useState("#4C9AFF");
   const attempt = useRef<Parameters<typeof createList>[0] | null>(null);
@@ -44,7 +45,8 @@ export default function AddNewListScreen() {
       !attempt.current ||
       attempt.current.name !== name.trim() ||
       attempt.current.color !== color ||
-      attempt.current.icon !== icon
+      attempt.current.icon !== icon ||
+      attempt.current.description !== (description.trim() || null)
     )
       attempt.current = {
         id: randomUUID(),
@@ -52,6 +54,7 @@ export default function AddNewListScreen() {
         name: name.trim(),
         color,
         icon,
+        description: description.trim() || null,
       };
     create.mutate(attempt.current);
   };
@@ -76,6 +79,7 @@ export default function AddNewListScreen() {
           onSubmitEditing={submit}
         />
       </FormField>
+      <FormField label="Description"><TextInput placeholder="Optional" textAlign="right" maxLength={2000} onChangeText={setDescription} editable={!create.isPending} /></FormField>
       <FormField label="Icon">
         <Picker
           appearance="menu"

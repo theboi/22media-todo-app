@@ -3,7 +3,10 @@ import { Stack } from "expo-router/stack";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { View } from "react-native";
-import { PlusButton } from "@/components/plus-button";
+import { useState } from "react";
+import { ListHeaderActions } from "@/features/lists/components/list-header-actions";
+import { DeleteListDialog } from "@/features/lists/components/delete-list-dialog";
+import { listGradient } from "@/features/lists/list-gradient";
 import { TodoList } from "@/features/todos/components/todo-list";
 import { sortTodos } from "@/features/todos/sort-todos";
 import { fetchList } from "@/lib/api/todo-lists";
@@ -11,6 +14,7 @@ import { useSurfaceColors } from "@/hooks/use-surface-colors";
 
 export default function ListScreen() {
   const router = useRouter();
+  const [deleting, setDeleting] = useState(false);
   const { id } = useLocalSearchParams<{ id: string }>();
   const colors = useSurfaceColors();
   const {
@@ -37,18 +41,16 @@ export default function ListScreen() {
       <Stack.Screen
         options={{
           title: list?.name ?? "List",
-          headerRight: () => (
-            <PlusButton
-              label="New todo"
-              disabled={!list}
-              onPress={() =>
-                router.push({
-                  pathname: "/(tabs)/lists/add-todo",
-                  params: { listId: id },
-                })
-              }
-            />
-          ),
+          headerTintColor: list ? "#FFFFFF" : undefined,
+          headerShadowVisible: false,
+          headerBackground: list ? () => <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: list.color, experimental_backgroundImage: listGradient(list.color) }} /> : undefined,
+          headerRight: list ? () => <ListHeaderActions
+            owner={list.role === "owner"}
+            onCreate={() => router.push({ pathname: "/(tabs)/lists/add-todo", params: { listId: id } })}
+            onShare={() => router.push({ pathname: "/(tabs)/lists/share", params: { listId: id } })}
+            onRename={() => router.push({ pathname: "/(tabs)/lists/edit", params: { listId: id } })}
+            onDelete={() => setDeleting(true)}
+          /> : undefined,
         }}
       />
       <TodoList
@@ -68,6 +70,7 @@ export default function ListScreen() {
         }}
         header={
           <>
+            {list && <ListItem supportingText={list.description ?? "Add a description"} onPress={list.role === "owner" ? () => router.push({ pathname: "/(tabs)/lists/edit", params: { listId: id } }) : undefined}><Text>{list.description ? "Description" : "Add Description"}</Text></ListItem>}
             {status && (
               <ListItem onPress={error ? () => void refetch() : undefined}>
                 <Text>{status}</Text>
@@ -76,6 +79,7 @@ export default function ListScreen() {
           </>
         }
       />
+      {deleting && list && <DeleteListDialog list={list} onDismiss={() => setDeleting(false)} onDeleted={() => router.replace("/(tabs)/lists")} />}
     </View>
   );
 }

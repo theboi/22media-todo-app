@@ -42,6 +42,7 @@ export const createList = async (input: {
   name: string;
   color: string;
   icon: string;
+  description?: string | null;
   key: string;
 }) => {
   const { key, ...body } = input;
@@ -63,3 +64,9 @@ export const fetchList = async (id: string, signal: AbortSignal) =>
   readListDetail(
     await apiRequest(`/todo-lists/${encodeURIComponent(id)}`, signal),
   );
+
+export const updateList = async ({ id, key, ...body }: { id: string; key: string; name: string; description: string | null }) => {
+  const [list] = readLists([await apiRequest(`/todo-lists/${encodeURIComponent(id)}`, undefined, body, { method: "PATCH", key })]);
+  if (!list) throw new Error("The server returned an invalid list.");
+  return list;
+};
