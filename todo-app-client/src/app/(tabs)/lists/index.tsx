@@ -33,7 +33,7 @@ export default function ListsScreen() {
       <Stack.Screen
         options={{
           headerRight: () => (
-            <PlusButton label="New list" onPress={() => router.push('/(tabs)/lists/add-new')} />
+            <PlusButton label="New list" onPress={() => router.push('/lists/add-new')} />
           ),
         }}
       />
@@ -44,13 +44,13 @@ export default function ListsScreen() {
             list={list}
             onActions={() => setSelected({ list, confirm: false })}
             onDelete={() => setSelected({ list, confirm: true })}
-            onRename={() => router.push({ pathname: "/(tabs)/lists/edit-list", params: { listId: list.id } })}
-            onShare={() => router.push({ pathname: "/(tabs)/lists/share", params: { listId: list.id } })}
+            onRename={() => router.push({ pathname: "/lists/edit-list", params: { listId: list.id } })}
+            onShare={() => router.push({ pathname: "/lists/share", params: { listId: list.id } })}
           />
         )}
         header={
           <>
-            <PendingShares onVerify={() => router.push("/(tabs)/lists/verify-email")} />
+            <PendingShares onVerify={() => router.push("/lists/verify-email")} />
             {query.error ? <ListsErrorState message={query.error.message} onRetry={() => void query.refetch()} /> : null}
           </>
         }
@@ -78,8 +78,8 @@ export default function ListsScreen() {
           key={selected.list.id}
           {...selected}
           onDismiss={() => setSelected(null)}
-          onEdit={() => { const id = selected.list.id; setSelected(null); router.push({ pathname: "/(tabs)/lists/edit-list", params: { listId: id } }); }}
-          onShare={() => { const id = selected.list.id; setSelected(null); router.push({ pathname: "/(tabs)/lists/share", params: { listId: id } }); }}
+          onEdit={() => { const id = selected.list.id; setSelected(null); router.push({ pathname: "/lists/edit-list", params: { listId: id } }); }}
+          onShare={() => { const id = selected.list.id; setSelected(null); router.push({ pathname: "/lists/share", params: { listId: id } }); }}
         />
       )}
     </View>
