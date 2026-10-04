@@ -50,12 +50,13 @@ export default function ListScreen() {
           headerRight: list ? () => <ListHeaderActions
             owner={list.role === "owner"}
             hasDescription={Boolean(list.description)}
-            onShare={() => router.push({ pathname: "/(tabs)/lists/share", params: { listId: id } })}
+            onShare={() => router.push({ pathname: "/lists/share", params: { listId: id } })}
             onRename={() => router.push({ pathname: "/lists/edit-list", params: { listId: id } })}
-            onDescription={() => router.push({ pathname: "/(tabs)/lists/edit-list", params: { listId: id, field: "description" } })}
+            onDescription={() => router.push({ pathname: "/lists/edit-list", params: { listId: id, field: "description" } })}
             onDelete={() => setDeleting(true)}
           /> : undefined,
-          headerLargeTitleEnabled: true
+          headerLargeTitleEnabled: true,
+          headerBackButtonDisplayMode: "minimal"
         }}
       />
       <TodoList
@@ -84,8 +85,8 @@ export default function ListScreen() {
           </>
         }
       />
-      {list && <View style={{ position: "absolute", right: 20, bottom: Math.max(16, insets.bottom) }}><FloatingCreateButton onPress={() => router.push({ pathname: "/(tabs)/lists/add-todo", params: { listId: id } })} /></View>}
-      {deleting && list && <DeleteListDialog list={list} onDismiss={() => setDeleting(false)} onDeleted={() => router.replace("/(tabs)/lists")} />}
+      {list && <View style={{ position: "absolute", right: 20, bottom: Math.max(16, insets.bottom) }}><FloatingCreateButton onPress={() => router.push({ pathname: "/lists/add-todo", params: { listId: id } })} /></View>}
+      {deleting && list && <DeleteListDialog list={list} onDismiss={() => setDeleting(false)} onDeleted={() => router.replace("/lists")} />}
     </View>
   );
 }
