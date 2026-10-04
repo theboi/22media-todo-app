@@ -81,3 +81,12 @@ Implemented sequentially by section:
 - `f19c65f`: Matching Sign In/Sign Up Stack forms, left labels/right fields, removed explanatory copy and link underline.
 
 Final review repairs navigation callbacks after sheet dismissal, Android checkbox hosting, the iOS alert anchor, and fresh share retry keys after successful invitations. Browser verification found a native-only SwiftUI modifier import in the shared button; platform-specific modifier helpers remove that web runtime failure. Native glass styling and swipe gestures still need physical-device verification.
+
+## Todo interactions, list menus and pin visibility
+
+- `21b876f`: Shared action menus support long-press triggers and icons across platforms. Android uses local raster icon assets; iOS uses SF Symbols.
+- `5350b57`: Todo name edits inline on tap; Return/blur saves a name-only PATCH with a stable retry key. Long press offers Add/Edit Description; description text no longer navigates.
+- `c90b0a9`: List description has a separate header-menu action; Rename is name-only. Create Todo moves to a bottom-right circular glassProminent button on iOS, with filled fallback on Android/web. Review caught the SDK57 requirement to supply a label before systemImage renders; labelStyle(iconOnly) preserves the Plus appearance.
+- `1ab8568`: Pin cards retain their list color when experimental gradients are unavailable. Browser reproduction showed loaded selectable cards with white text on a transparent background; adding the color fallback made the grid visible. No speculative layout change was needed.
+- Browser verification: created Interaction Demo and a sample todo; inline rename and description save persist after reload. Clearing the selection removes the Home section; selecting and saving again restores it. The demo data remains in the browser guest account.
+- Checks: 25 client tests, typecheck, lint and iOS/Android/web exports pass. Native context-menu gestures, text input focus and glass appearance require a physical-device check. Original user edits in navigation/layout and pin-form formatting remain unstaged.
