@@ -9,7 +9,16 @@ import {
 } from "react-native";
 import type { TodoList } from "@/lib/api/lists";
 
-export function ListGrid({ lists, renderCard, header, footer, empty, refreshing, onRefresh, style }: {
+export function ListGrid({
+  lists,
+  renderCard,
+  header,
+  footer,
+  empty,
+  refreshing,
+  onRefresh,
+  style,
+}: {
   lists: TodoList[];
   renderCard(list: TodoList): React.ReactElement;
   header?: React.ReactElement | null;

@@ -11,18 +11,38 @@ import { selectedPins } from "../pinning";
 import { ListGrid } from "./list-grid";
 import { ListCard } from "./list-card";
 
-export function PinListsSheet({ lists, pinned, onDismiss }: { lists: TodoList[]; pinned: string[]; onDismiss(): void }) {
-  const [selected, setSelected] = useState(() => pinned.filter(id => lists.some(list => list.id === id)));
+export function PinListsSheet({
+  lists,
+  pinned,
+  onDismiss,
+}: {
+  lists: TodoList[];
+  pinned: string[];
+  onDismiss(): void;
+}) {
+  const [selected, setSelected] = useState(() =>
+    pinned.filter((id) => lists.some((list) => list.id === id))
+  );
   const window = useWindowDimensions();
   const [width, setWidth] = useState(Math.min(window.width, 720) - 40);
   const colors = useSurfaceColors();
   const attempt = useRef<{ ids: string[]; key: string } | null>(null);
   const client = useQueryClient();
-  const save = useMutation({ mutationFn: savePinnedLists, networkMode: "always", onSuccess: value => { client.setQueryData(["pinned-lists"], value); } });
+  const save = useMutation({
+    mutationFn: savePinnedLists,
+    networkMode: "always",
+    onSuccess: (value) => {
+      client.setQueryData(["pinned-lists"], value);
+    },
+  });
   const submit = () => {
     if (save.isPending) return;
     const ids = selectedPins(lists, pinned, selected);
-    if (!attempt.current || JSON.stringify(attempt.current.ids) !== JSON.stringify(ids)) attempt.current = { ids, key: randomUUID() };
+    if (
+      !attempt.current ||
+      JSON.stringify(attempt.current.ids) !== JSON.stringify(ids)
+    )
+      attempt.current = { ids, key: randomUUID() };
     save.mutate(attempt.current, { onSuccess: onDismiss });
   };
   // iOS formSheet sizes its first scroll view to the entire sheet. Keep the
@@ -63,7 +83,7 @@ export function PinListsSheet({ lists, pinned, onDismiss }: { lists: TodoList[];
             </Text>
           )}
           <Host matchContents={{ vertical: true }} style={{ width: "100%" }}>
-            <Column spacing={12} style={{ width }}>
+            <Column spacing={12} style={{ width, paddingVertical: 16 }}>
               <WideButton
                 label={save.isPending ? "Saving…" : "Save Selected Lists"}
                 width={width}
