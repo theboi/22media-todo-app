@@ -1,6 +1,6 @@
+import { WideButton } from "@/components/ui/wide-button";
 import { FormFields } from "@/components/ui/form-fields";
-import { Button, Column, Host, Text } from "@expo/ui";
-import { buttonBorderShape, buttonStyle, controlSize } from "@expo/ui/swift-ui/modifiers";
+import { Column, Host, Text } from "@expo/ui";
 import { Children, useState } from "react";
 import { ScrollView, useWindowDimensions } from "react-native";
 
@@ -12,6 +12,8 @@ export function SheetForm({
   pending,
   onSubmit,
   fieldCount,
+  onCancel,
+  footer,
 }: {
   children: React.ReactNode;
   error?: string;
@@ -20,6 +22,8 @@ export function SheetForm({
   pending: boolean;
   onSubmit(): void;
   fieldCount?: number;
+  onCancel?(): void;
+  footer?: React.ReactNode;
 }) {
   const { fontScale, width: screenWidth } = useWindowDimensions();
   const [width, setWidth] = useState(screenWidth);
@@ -42,23 +46,10 @@ export function SheetForm({
           </FormFields>
           <Column spacing={12} style={{ paddingHorizontal: 16 }}>
             {error ? <Text>{error}</Text> : null}
-            <Button
-              disabled={disabled}
-              onPress={onSubmit}
-              style={{ paddingVertical: 12 }}
-              modifiers={[
-                buttonBorderShape("capsule"),
-                buttonStyle("glassProminent"),
-                controlSize('extraLarge'),
-              ]}
-            >
-              <Text
-                style={{ width: Math.max(0, width - 72) }}
-                textStyle={{ textAlign: "center", fontWeight: "600" }}
-              >
-                {submitLabel}
-              </Text>
-            </Button>
+            {footer}
+            <WideButton label={submitLabel} disabled={disabled} onPress={onSubmit} width={Math.max(0, width - 32)} />
+            {onCancel && <WideButton label="Cancel" variant="outlined" appearance="glass" disabled={pending} onPress={onCancel} width={Math.max(0, width - 32)} />}
+
           </Column>
         </Column>
       </Host>

@@ -1,19 +1,17 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import { unpinnedLists, appendPins } from './pinning.ts';
-
-const lists = [{id:'first'}, {id:'second'}, {id:'third'}];
-test('pin picker offers only lists not already on Home', () => {
-  assert.deepEqual(unpinnedLists(lists, ['first']).map(list => list.id), ['second', 'third']);
-  assert.deepEqual(unpinnedLists(lists, ['first','second','third']), []);
+import test from "node:test";
+import assert from "node:assert/strict";
+import { selectedPins } from "./pinning.ts";
+const lists = [{ id: "a" }, { id: "b" }, { id: "c" }];
+test("pin selection can remove existing pins and preserve the order of retained pins", () => {
+  assert.deepEqual(selectedPins(lists, ["b", "a"], ["a", "c"]), ["a", "c"]);
+  assert.deepEqual(selectedPins(lists, ["b", "a"], ["a", "b", "c"]), ["b", "a", "c"]);
 });
-test('pinning preserves existing order and appends accessible selections once', () => {
-  const pinned = ['third', 'first', 'gone'];
-  const selected = ['second','first','second','missing'];
-  assert.deepEqual(appendPins(lists, pinned, selected), ['third','first','second']);
-  assert.deepEqual(pinned, ['third','first','gone']);
-  assert.deepEqual(selected, ['second','first','second','missing']);
+test("empty pin selection clears all Home sections", () => {
+  assert.deepEqual(selectedPins(lists, ["a", "b"], []), []);
 });
-test('empty selection retains all accessible existing pins', () => {
-  assert.deepEqual(appendPins(lists, ['first','third'], []), ['first','third']);
+test("pin selection drops inaccessible ids and duplicates without mutating inputs", () => {
+  const pinned = ["missing", "b", "b"], selected = ["b", "c", "c", "gone"];
+  assert.deepEqual(selectedPins(lists, pinned, selected), ["b", "c"]);
+  assert.deepEqual(pinned, ["missing", "b", "b"]);
+  assert.deepEqual(selected, ["b", "c", "c", "gone"]);
 });

@@ -3,19 +3,16 @@ import { Stack } from "expo-router/stack";
 import { PinButton } from "@/features/home/components/pin-button";
 import { useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import { View } from "react-native";
 import { fetchLists } from "@/lib/api/todo-lists";
 import { fetchTodos, fetchPinnedLists } from "@/lib/api/todos";
 import { outstandingTodos } from "@/lib/api/home-data";
 import { TodoList, type TodoListSection } from "@/features/todos/components/todo-list";
-import { PinListsSheet } from "@/features/lists/components/pin-lists-sheet";
 import { useSurfaceColors } from "@/hooks/use-surface-colors";
 
 export default function HomeScreen() {
   const colors = useSurfaceColors();
   const router = useRouter();
-  const [pinning, setPinning] = useState(false);
   const todos = useQuery({
     queryKey: ["todos"],
     queryFn: ({ signal }) => fetchTodos(signal),
@@ -65,7 +62,7 @@ export default function HomeScreen() {
   else if (loading) status = paused ? "You’re offline. Reconnect to load Home." : "Loading Home…";
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <Stack.Screen options={{ headerRight: () => <PinButton disabled={!lists.data || !pins.data} onPress={() => setPinning(true)} /> }} />
+      <Stack.Screen options={{ headerRight: () => <PinButton disabled={!lists.data || !pins.data} onPress={() => router.push("/pin-lists")} /> }} />
       <TodoList
         sections={todos.data ? sections : []}
         onRefresh={refresh}
@@ -76,13 +73,6 @@ export default function HomeScreen() {
           </>
         }
       />
-      {pinning && (
-        <PinListsSheet
-          lists={lists.data ?? []}
-          pinned={pins.data ?? []}
-          onDismiss={() => setPinning(false)}
-        />
-      )}
     </View>
   );
 }

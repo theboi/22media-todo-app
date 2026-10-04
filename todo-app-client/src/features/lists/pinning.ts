@@ -1,11 +1,7 @@
 import type { TodoList } from "@/lib/api/lists";
 
-export const unpinnedLists = (lists: TodoList[], pinned: string[]) => {
-  const existing = new Set(pinned);
-  return lists.filter((list) => !existing.has(list.id));
-};
-
-export const appendPins = (lists: TodoList[], pinned: string[], selected: string[]) => {
-  const accessible = new Set(lists.map((list) => list.id));
-  return [...new Set([...pinned, ...selected])].filter((id) => accessible.has(id));
-};
+export function selectedPins(lists: TodoList[], pinned: string[], selected: string[]): string[] {
+  const available = new Set(lists.map(list => list.id));
+  const chosen = new Set(selected);
+  return [...new Set([...pinned.filter(id => chosen.has(id)), ...selected])].filter(id => available.has(id));
+}
