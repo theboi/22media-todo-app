@@ -16,6 +16,7 @@ export function ListGrid({
   refreshing,
   onRefresh,
   style,
+  bottomInset = 0,
 }: {
   lists: TodoList[];
   renderCard(list: TodoList): React.ReactElement;
@@ -25,6 +26,7 @@ export function ListGrid({
   refreshing?: boolean;
   onRefresh?(): void;
   style?: StyleProp<ViewStyle>;
+  bottomInset?: number;
 }) {
   const dimensions = useWindowDimensions();
   const width = Math.min(dimensions.width, 720);
@@ -44,6 +46,7 @@ export function ListGrid({
       columnWrapperStyle={columns > 1 ? { gap: 12 } : undefined}
       contentContainerStyle={{
         padding: 20,
+        paddingBottom: 20 + bottomInset,
         gap: 12,
         flexGrow: 1,
         width: "100%",
