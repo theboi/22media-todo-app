@@ -30,6 +30,7 @@ export function SheetForm({
 
   return (
     <ScrollView
+      automaticallyAdjustKeyboardInsets
       keyboardShouldPersistTaps="handled"
       contentContainerStyle={{ flexGrow: 1 }}
       style={{ flex: 1 }}
