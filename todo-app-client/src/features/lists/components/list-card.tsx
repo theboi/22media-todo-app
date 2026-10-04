@@ -38,6 +38,7 @@ export function ListCard({
         gap: 22,
         borderRadius: 20,
         borderCurve: "continuous",
+        backgroundColor: list.color,
         experimental_backgroundImage: listGradient(list.color),
         opacity: disabled ? 0.5 : 1,
         transform: [{ scale: pressed ? 0.98 : 1 }],
