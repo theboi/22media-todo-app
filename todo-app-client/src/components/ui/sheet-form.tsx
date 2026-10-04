@@ -1,8 +1,16 @@
 import { Button, Column, FieldGroup, Host, Text } from "@expo/ui";
+import { buttonBorderShape, buttonStyle, controlSize } from "@expo/ui/swift-ui/modifiers";
 import { Children, useState } from "react";
 import { View, useWindowDimensions } from "react-native";
 
-export function SheetForm({ children, error, submitLabel, disabled, pending, onSubmit }: {
+export function SheetForm({
+  children,
+  error,
+  submitLabel,
+  disabled,
+  pending,
+  onSubmit,
+}: {
   children: React.ReactNode;
   error?: string;
   submitLabel: string;
@@ -12,16 +20,21 @@ export function SheetForm({ children, error, submitLabel, disabled, pending, onS
 }) {
   const { fontScale, width: screenWidth } = useWindowDimensions();
   const [width, setWidth] = useState(screenWidth);
+
   return (
     <View
       style={{ flex: 1 }}
-      onLayout={event => setWidth(event.nativeEvent.layout.width)}
+      onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
     >
       <Host matchContents={{ vertical: true }} style={{ width: "100%" }}>
         <Column spacing={8} style={{ width }}>
           <FieldGroup
             disabled={pending}
-            style={{ width, height: Children.count(children) * 64 * Math.max(1, fontScale) + 32 }}
+            style={{
+              width,
+              height:
+                Children.count(children) * 70 * Math.max(1, fontScale) + 32,
+            }}
           >
             {children}
           </FieldGroup>
@@ -30,10 +43,15 @@ export function SheetForm({ children, error, submitLabel, disabled, pending, onS
             <Button
               disabled={disabled}
               onPress={onSubmit}
-              style={{ width: Math.max(0, width - 32), paddingVertical: 12 }}
+              style={{ paddingVertical: 12 }}
+              modifiers={[
+                buttonBorderShape("capsule"),
+                buttonStyle("glassProminent"),
+                controlSize('extraLarge'),
+              ]}
             >
               <Text
-                style={{ width: Math.max(0, width - 64) }}
+                style={{ width: Math.max(0, width - 72) }}
                 textStyle={{ textAlign: "center", fontWeight: "600" }}
               >
                 {submitLabel}

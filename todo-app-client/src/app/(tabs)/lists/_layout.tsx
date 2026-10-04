@@ -20,12 +20,12 @@ export default function ListsLayout() {
         options={{
           title: "Add New",
           presentation: "formSheet",
-          sheetAllowedDetents: [0.5, 1],
+          sheetAllowedDetents: [0.5],
         }}
       />
       <Stack.Screen
         name="add-todo"
-        options={{ title: "New Todo", presentation: "formSheet", sheetAllowedDetents: [0.5, 1], sheetGrabberVisible: true }}
+        options={{ title: "New Todo", presentation: "formSheet", sheetAllowedDetents: [0.5], sheetGrabberVisible: true }}
       />
     </Stack>
   );
