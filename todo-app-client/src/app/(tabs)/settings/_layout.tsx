@@ -15,7 +15,7 @@ export default function SettingsLayout() {
         options={{
           title: "Sign In",
           presentation: "formSheet",
-          sheetAllowedDetents: [0.5, 1],
+          sheetAllowedDetents: [0.6, 1],
           sheetGrabberVisible: true,
         }}
       />
@@ -24,7 +24,7 @@ export default function SettingsLayout() {
         options={{
           title: "Sign Up",
           presentation: "formSheet",
-          sheetAllowedDetents: [0.5, 1],
+          sheetAllowedDetents: [0.6, 1],
           sheetGrabberVisible: true,
         }}
       />
