@@ -21,7 +21,7 @@ Show once per installation, with “Create first list” primary and “Sign in�
 >
 > Begin by creating a List. Lists should be organised by areas in your life so that Eves can organise your Todos accurately.
 
-Initial guest provisioning requires connectivity. Later cached use works offline. Empty states retain Create first list. The green water-drop avatar is deferred.
+Initial guest provisioning requires connectivity. Later cached use works offline. Startup checks the saved session; a missing or server-rejected token automatically provisions a fresh device-linked guest, including after a development database reset. Concurrent startup/data requests share provisioning. Network/server failures retain saved credentials and show a retryable connection error rather than silently replacing an account. Empty states retain Create first list. The green water-drop avatar is deferred.
 
 ### Home — center tab, position 2, initial main tab
 

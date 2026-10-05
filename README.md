@@ -18,7 +18,7 @@ php artisan migrate
 php artisan serve --host=0.0.0.0 --port=8000
 ```
 
-Client (Node 22.13+; this workspace was verified with Node 26):
+Run the client in a second terminal (Node 22.13+; this workspace was verified with Node 26):
 
 ```sh
 cd todo-app-client
@@ -31,6 +31,8 @@ npx expo start
 The default API URL is localhost:8000/api for iOS/web and 10.0.2.2:8000/api for the Android emulator. Restart Expo after changing the URL. Use a native development build to verify platform controls and reminders; configure generated native projects through app.json, not by hand. The optional web preview is for development; its credentials/cache use localStorage, while native uses SecureStore/SQLite. Native destructive confirmation dialogs are not supported by the web preview.
 
 ## Demo workflow
+
+Start with an empty database; no demo login or sample lists are seeded. For a fresh recording, stop the API and run `php artisan migrate:fresh` inside `todo-app-api`, then restart it using the command above. This deletes all accounts and app data. Reload the client: a missing or rejected saved token automatically provisions a fresh guest using the installation's device ID. You do not need to clear app storage or sign in. Valid saved sessions are retained; connection/server failures do not discard credentials. Guest provisioning requires a reachable API.
 
 1. Create a first list as a guest, then add/edit/complete todos. First provisioning needs internet.
 2. After the first successful snapshot, disconnect, edit/create todos or create a list, restart, and reconnect. Pending actions survive restart. Conflicting todo revisions produce a separate copy.
@@ -50,14 +52,14 @@ php artisan test
 ```sh
 cd todo-app-client
 npm test
-npm run typecheck
+npx tsc --noEmit
 npm run lint
 npx expo-doctor
 npx expo export --platform web
 ```
 
-Verified: 14 backend tests / 163 assertions, Pint, 27 client tests, TypeScript, ESLint, Expo doctor (18/18) and web export. A real two-user HTTP smoke covered auth, verification/sharing, member permissions, revisions, idempotent retries, HEAD and hard deletion. Browser smoke covered guest onboarding and first-list creation against the running API. Independent review findings were corrected with regression tests.
+Latest checks: 15 backend tests / 192 assertions, Pint, 30 client tests, TypeScript and ESLint. A live HTTP check confirmed stale-token recovery into one device-linked guest with empty lists and session reuse. Previous verification included Expo doctor (18/18), platform exports, guest onboarding and a two-user HTTP smoke covering auth, verification/sharing, member permissions, revisions, idempotent retries, HEAD and hard deletion.
 
 Remaining manual verification: iOS/Android rendering, keyboard behavior and actual notification delivery. No production deployment, conversation capture, password recovery or guest restoration is included.
 
-See docs/plans/2026-10-02-eves-implementation-plan.md, the PRD and the frozen API contract. The working tree remains uncommitted on codex/eves-mvp.
+See docs/plans/2026-10-02-eves-implementation-plan.md, the PRD and the frozen API contract.
