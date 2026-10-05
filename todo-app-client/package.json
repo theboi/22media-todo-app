@@ -7,6 +7,7 @@
     "@tanstack/react-query": "^5.104.0",
     "color": "^5.0.3",
     "expo": "~57.0.26",
+    "expo-build-properties": "~57.0.22",
     "expo-constants": "~57.0.20",
     "expo-crypto": "~57.0.3",
     "expo-device": "~57.0.2",
@@ -41,8 +42,8 @@
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
     "test": "node --import tsx --test src/lib/auth/*.test.mjs src/lib/api/*.test.mjs src/features/todos/*.test.mjs src/features/lists/*.test.mjs"
