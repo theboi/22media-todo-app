@@ -5,7 +5,7 @@ const session = {
   account: { id: "registered-account" },
   user: { email: "person@example.com" },
 };
-const setup = (transport) => {
+const setup = (transport, checkSession = false) => {
   const saved = new Map([
     ["eves.token", "guest-token"],
     ["eves.device", "device-id"],
@@ -21,7 +21,9 @@ const setup = (transport) => {
         },
       },
       uuid: () => "device-id",
-      transport,
+      transport: (url, init) => !checkSession && String(url).endsWith("/me")
+        ? Response.json({data:{account:{id:"guest-account"},user:null}})
+        : transport(url, init),
     }),
   };
 };
@@ -234,4 +236,33 @@ test('guest provisioning failure after logout cannot reuse the outgoing bearer',
   });
   await assert.rejects(client.signOut(), /Cannot reach/);
   assert.equal(saved.get('eves.token'), '');
+});
+
+test("a rejected saved session becomes a fresh device guest for concurrent startup and data requests", async () => {
+  let guests = 0;
+  const { client, saved } = setup(async (url, init) => {
+    if (String(url).endsWith('/guest')) {
+      guests++;
+      assert.deepEqual(JSON.parse(init.body), {device_id:'device-id'});
+      return Response.json({data:{token_type:'Bearer',token:'fresh-token',session:{account:{id:'fresh-guest'},user:null}}});
+    }
+    assert.equal(String(url), 'http://test/api/auth/me');
+    if (init.headers.Authorization === 'Bearer guest-token') {
+      return Response.json({error:{code:'UNAUTHENTICATED'}}, {status:401});
+    }
+    assert.equal(init.headers.Authorization, 'Bearer fresh-token');
+    return Response.json({data:{account:{id:'fresh-guest'},user:null}});
+  }, true);
+  const [session, token] = await Promise.all([client.getSession(), client.getToken()]);
+  assert.deepEqual(session, {accountId:'fresh-guest',email:null});
+  assert.equal(token, 'fresh-token');
+  assert.equal(saved.get('eves.token'), 'fresh-token');
+  assert.equal(saved.get('eves.device'), 'device-id');
+  assert.equal(guests, 1);
+});
+
+test("a connection failure does not discard a potentially valid account", async () => {
+  const {client, saved} = setup(async () => { throw new Error('offline'); }, true);
+  await assert.rejects(client.getToken(), /Cannot reach/);
+  assert.equal(saved.get('eves.token'), 'guest-token');
 });

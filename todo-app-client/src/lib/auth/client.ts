@@ -39,7 +39,7 @@ export const createAuthClient = ({
   uuid,
   transport = (input, init) => globalThis.fetch(input, init),
 }: Deps) => {
-  let provisioning: Promise<string> | null = null;
+  let resolving: Promise<{ token: string; session: AuthSession }> | null = null;
   let installation: Promise<string> | null = null;
   const send = async (
     path: string,
@@ -130,20 +130,23 @@ export const createAuthClient = ({
     await storage.set("eves.token", data.token);
     return { token: data.token, session };
   };
-  const getToken = async (): Promise<string> => {
-    const token = await storage.get("eves.token");
-    if (token) return token;
-    if (!provisioning)
-      provisioning = (async () =>
-        (
-          await install(
-            await send("/auth/guest", null, { device_id: await deviceId() }),
-          )
-        ).token)().finally(() => {
-        provisioning = null;
-      });
-    return provisioning;
+  const resolveSession = (): Promise<{ token: string; session: AuthSession }> => {
+    if (!resolving)
+      resolving = (async () => {
+        const token = await storage.get("eves.token");
+        if (token) {
+          try {
+            return { token, session: parseSession(await send("/auth/me", token)) };
+          } catch (error) {
+            if (!(error instanceof AuthError && error.code === "UNAUTHENTICATED")) throw error;
+            await storage.set("eves.token", "");
+          }
+        }
+        return install(await send("/auth/guest", null, { device_id: await deviceId() }));
+      })().finally(() => { resolving = null; });
+    return resolving;
   };
+  const getToken = async (): Promise<string> => (await resolveSession()).token;
   return {
     getToken,
     signOut: async (): Promise<AuthSession> => {
@@ -156,7 +159,7 @@ export const createAuthClient = ({
         }
       }
       await storage.set("eves.token", "");
-      return parseSession(await send("/auth/me", await getToken()));
+      return (await resolveSession()).session;
     },
     signUp: async (
       email: string,
@@ -172,8 +175,7 @@ export const createAuthClient = ({
           }),
         )
       ).session,
-    getSession: async (): Promise<AuthSession> =>
-      parseSession(await send("/auth/me", await getToken())),
+    getSession: async (): Promise<AuthSession> => (await resolveSession()).session,
     signIn: async (email: string, password: string): Promise<AuthSession> => {
       const body = {
         email: email.trim().toLowerCase(),
