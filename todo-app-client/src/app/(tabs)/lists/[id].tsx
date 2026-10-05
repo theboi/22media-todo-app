@@ -76,7 +76,7 @@ export default function ListScreen() {
         }}
         header={
           <>
-            {list?.description && <ListItem supportingText={list.description}><Text>Description</Text></ListItem>}
+            {list?.description && <ListItem>{list.description}</ListItem>}
             {status && (
               <ListItem onPress={error ? () => void refetch() : undefined}>
                 <Text>{status}</Text>
